@@ -38,7 +38,7 @@
             // 
             this.btnAdd.Location = new System.Drawing.Point(345, 29);
             this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(142, 49);
+            this.btnAdd.Size = new System.Drawing.Size(142, 35);
             this.btnAdd.TabIndex = 0;
             this.btnAdd.Text = "开始添加";
             this.btnAdd.UseVisualStyleBackColor = true;
@@ -69,7 +69,7 @@
             this.lblDeviceNum.Size = new System.Drawing.Size(0, 17);
             this.lblDeviceNum.TabIndex = 3;
             // 
-            // Form1
+            // WeChatAddFriendForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -78,8 +78,10 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.tbPhoneNos);
             this.Controls.Add(this.btnAdd);
-            this.Name = "Form1";
-            this.Text = "Form1";
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Name = "WeChatAddFriendForm";
+            this.Text = "微信添加好友";
             this.ResumeLayout(false);
             this.PerformLayout();
 

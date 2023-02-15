@@ -1,5 +1,6 @@
 using AdvancedSharpAdbClient;
 using System.Threading;
+using WeChatAddFriend.Tools;
 
 namespace WeChatAddFriend
 {
@@ -7,7 +8,7 @@ namespace WeChatAddFriend
     {
         public static AdbClient adbClient;
         public static AdbServer srv;
-        public static readonly string ADBPath = "tools\\platform-tools\\adb.exe";
+        public static readonly string ADBPath = "platform-tools\\adb.exe";
 
         public WeChatAddFriendForm()
         {
@@ -86,56 +87,74 @@ namespace WeChatAddFriend
                 if (add != null)
                 {
                     adbClient.Click(d, add.cords);
-                    await Task.Delay(1000);
+                    await Task.Delay(2000);
                 }
 
-                USERNOTEXIST:
+                ADD_NEXT_PHONE:
                 add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/cd7']", TimeSpan.FromSeconds(2));
                 if (add != null)
                 {
                     adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
                     adbClient.ClearInput(d, 15);
                 }
 
-                adbClient.SendText(d, phoneNos[idx]);
+                if (idx >= phoneNos.Count) break;
 
-                await Task.Delay(1000);
+                //设置文本手机号
+                adbClient.SendText(d, phoneNos[idx]);
+                await Task.Delay(3000);
 
                 //点击搜索
                 add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/kms']", TimeSpan.FromSeconds(2));
                 adbClient.Click(d, add.cords);
 
-                await Task.Delay(1000);
+                await Task.Delay(2000);
 
                 var userNotExist = adbClient.FindElement(d, "//node[@text='该用户不存在']", TimeSpan.FromSeconds(2));
                 if (userNotExist != null)
                 {
+                    Log.Info($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} add phone ---{phoneNos[idx]}--跳过用户不存在");
                     idx++;
-                    goto USERNOTEXIST;
+                    goto ADD_NEXT_PHONE;
                 }
 
-                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/khj']", TimeSpan.FromSeconds(2));
+                //已经是好友的 按钮 text 为发消息
+                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/khj' and @text='发消息']", TimeSpan.FromSeconds(2));
+                if (add != null)
+                {
+                    await Task.Delay(2000);
+                    adbClient.BackBtn(d);
+                    Log.Info($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} add phone ---{phoneNos[idx]}--跳过用户已经是好友");
+                    idx++;
+                    goto ADD_NEXT_PHONE;
+
+                }                    
+                //添加好友到通讯录
+                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/khj' and @text='添加到通讯录']", TimeSpan.FromSeconds(2));
 
                 adbClient.Click(d, add.cords);
+                await Task.Delay(2000);
 
-                await Task.Delay(1000);
-
-
+                //发送添加好友按钮
                 add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/e9q']", TimeSpan.FromSeconds(2));
 
                 adbClient.Click(d, add.cords);
-
                 await Task.Delay(1000);
 
+                //再次点击发送加好友请求
+                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/e9q']", TimeSpan.FromSeconds(2));
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
+                }
+                //返回
                 adbClient.BackBtn(d);
-
-                await Task.Delay(1000);
-
+                await Task.Delay(2000);
                 adbClient.BackBtn(d);
-
-
+                Log.Info($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} add phone ---{phoneNos[idx]}");
                 idx++;
-
             }
         }
     }
