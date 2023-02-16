@@ -107,9 +107,12 @@ namespace WeChatAddFriend
 
                 //点击搜索
                 add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/kms']", TimeSpan.FromSeconds(2));
-                adbClient.Click(d, add.cords);
 
-                await Task.Delay(2000);
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(2000);
+                }
 
                 var userNotExist = adbClient.FindElement(d, "//node[@text='该用户不存在']", TimeSpan.FromSeconds(2));
                 if (userNotExist != null)
@@ -132,15 +135,19 @@ namespace WeChatAddFriend
                 }                    
                 //添加好友到通讯录
                 add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/khj' and @text='添加到通讯录']", TimeSpan.FromSeconds(2));
-
-                adbClient.Click(d, add.cords);
-                await Task.Delay(2000);
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(2000);
+                }
 
                 //发送添加好友按钮
                 add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/e9q']", TimeSpan.FromSeconds(2));
-
-                adbClient.Click(d, add.cords);
-                await Task.Delay(1000);
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
+                }
 
                 //再次点击发送加好友请求
                 add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/e9q']", TimeSpan.FromSeconds(2));
