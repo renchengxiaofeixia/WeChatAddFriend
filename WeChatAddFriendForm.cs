@@ -2,6 +2,7 @@ using AdvancedSharpAdbClient;
 using System.IO;
 using System.Threading;
 using WeChatAddFriend.Tools;
+using static System.Net.WebRequestMethods;
 
 namespace WeChatAddFriend
 {
@@ -10,6 +11,7 @@ namespace WeChatAddFriend
         public static AdbClient adbClient;
         public static AdbServer srv;
         public static readonly string ADBPath = "platform-tools\\adb.exe";
+        public static int addFriendTotalCount = 0;
 
         public WeChatAddFriendForm()
         {
@@ -48,9 +50,11 @@ namespace WeChatAddFriend
 
         private async void btnAdd_Click(object sender, EventArgs e)
         {
+            addFriendTotalCount = 0;
+
             var devices = adbClient.GetDevices();
 
-            var phoneNos = tbPhoneNos.Text.Split("\n", StringSplitOptions.RemoveEmptyEntries);
+            var phoneNos = txtLog.Text.Split("\n", StringSplitOptions.RemoveEmptyEntries);
 
             var avgPhoneNoCnt = phoneNos.Count() / adbClient.GetDevices().Count();
 
@@ -67,8 +71,12 @@ namespace WeChatAddFriend
         {
             var idx = 0;
 
-            while(idx < phoneNos.Count)
-            { 
+            IShellOutputReceiver rcvr = null;
+            //启动微信
+            adbClient.ExecuteRemoteCommand("am start com.tencent.mm/com.tencent.mm.ui.LauncherUI", d,rcvr);
+
+            while (idx < phoneNos.Count)
+            {
                 var add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/hy6']", TimeSpan.FromSeconds(2));
 
                 if (add != null)
@@ -92,7 +100,7 @@ namespace WeChatAddFriend
                     await Task.Delay(2000);
                 }
 
-                ADD_NEXT_PHONE:
+            ADD_NEXT_PHONE:
                 add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/cd7']", TimeSpan.FromSeconds(2));
                 if (add != null)
                 {
@@ -134,7 +142,7 @@ namespace WeChatAddFriend
                     idx++;
                     goto ADD_NEXT_PHONE;
 
-                }                    
+                }
                 //添加好友到通讯录
                 add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/khj' and @text='添加到通讯录']", TimeSpan.FromSeconds(2));
                 if (add != null)
@@ -160,11 +168,37 @@ namespace WeChatAddFriend
                 }
                 //返回
                 adbClient.BackBtn(d);
-                await Task.Delay(2000);
+                var rt = int.TryParse(txtSecd.Text.Trim(),out var secd);
+
+                await Task.Delay(secd * 1000);
                 adbClient.BackBtn(d);
+
+                addFriendTotalCount++;
+
                 Log.Info($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} add phone ---{phoneNos[idx]}");
                 idx++;
             }
+        }
+
+        private void btnImportData_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Filter = "文本文件(*.txt)|*.txt";
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                var phoneNos = System.IO.File.ReadAllLines(dlg.FileName);
+                btnImportData.Text = $"导入数据({phoneNos.Count()}条)";
+            }
+        }
+
+        void PrintLog(string logtxt)
+        {
+            txtLog.Text += "\n" + logtxt;
+        }
+
+        private void txtLog_TextChanged(object sender, EventArgs e)
+        {
+            txtLog.SelectionStart = txtLog.Text.Length;
         }
     }
 
