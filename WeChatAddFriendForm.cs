@@ -1,4 +1,5 @@
 using AdvancedSharpAdbClient;
+using System.IO;
 using System.Threading;
 using WeChatAddFriend.Tools;
 
@@ -19,6 +20,7 @@ namespace WeChatAddFriend
 
         private void WeChatAddFriendForm_Load(object? sender, EventArgs e)
         {
+            Log.Initiate(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"运行日志.txt"), false, (int)Math.Pow(2.0, 23.0));
             srv = new AdbServer();
             if (!srv.GetStatus().IsRunning)
             {
