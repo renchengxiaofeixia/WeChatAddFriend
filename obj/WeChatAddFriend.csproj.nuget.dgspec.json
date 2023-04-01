@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "G:\\src\\WeChatAddFriend\\WeChatAddFriend.csproj": {}
+    "D:\\src\\WeChatAddFriend\\WeChatAddFriend.csproj": {}
   },
   "projects": {
-    "G:\\src\\WeChatAddFriend\\WeChatAddFriend.csproj": {
+    "D:\\src\\WeChatAddFriend\\WeChatAddFriend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "G:\\src\\WeChatAddFriend\\WeChatAddFriend.csproj",
+        "projectUniqueName": "D:\\src\\WeChatAddFriend\\WeChatAddFriend.csproj",
         "projectName": "WeChatAddFriend",
-        "projectPath": "G:\\src\\WeChatAddFriend\\WeChatAddFriend.csproj",
-        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "G:\\src\\WeChatAddFriend\\obj\\",
+        "projectPath": "D:\\src\\WeChatAddFriend\\WeChatAddFriend.csproj",
+        "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
+        "outputPath": "D:\\src\\WeChatAddFriend\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "D:\\vsshared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -26,7 +22,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -63,7 +58,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.202\\RuntimeIdentifierGraph.json"
         }
       }
     }

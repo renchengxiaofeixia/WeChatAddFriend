@@ -28,109 +28,108 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnAdd = new System.Windows.Forms.Button();
-            this.lblDeviceNum = new System.Windows.Forms.Label();
-            this.btnImportData = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.txtSecd = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.txtLog = new System.Windows.Forms.RichTextBox();
-            this.SuspendLayout();
+            btnAdd = new Button();
+            lblDeviceNum = new Label();
+            btnImportData = new Button();
+            label2 = new Label();
+            label3 = new Label();
+            txtSecd = new TextBox();
+            label1 = new Label();
+            txtLog = new RichTextBox();
+            SuspendLayout();
             // 
             // btnAdd
             // 
-            this.btnAdd.Location = new System.Drawing.Point(345, 29);
-            this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(142, 35);
-            this.btnAdd.TabIndex = 0;
-            this.btnAdd.Text = "开始添加";
-            this.btnAdd.UseVisualStyleBackColor = true;
-            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
+            btnAdd.Location = new Point(345, 26);
+            btnAdd.Name = "btnAdd";
+            btnAdd.Size = new Size(142, 31);
+            btnAdd.TabIndex = 0;
+            btnAdd.Text = "开始添加";
+            btnAdd.UseVisualStyleBackColor = true;
+            btnAdd.Click += btnAdd_Click;
             // 
             // lblDeviceNum
             // 
-            this.lblDeviceNum.AutoSize = true;
-            this.lblDeviceNum.Location = new System.Drawing.Point(103, 9);
-            this.lblDeviceNum.Name = "lblDeviceNum";
-            this.lblDeviceNum.Size = new System.Drawing.Size(0, 17);
-            this.lblDeviceNum.TabIndex = 3;
+            lblDeviceNum.AutoSize = true;
+            lblDeviceNum.Location = new Point(103, 8);
+            lblDeviceNum.Name = "lblDeviceNum";
+            lblDeviceNum.Size = new Size(0, 15);
+            lblDeviceNum.TabIndex = 3;
             // 
             // btnImportData
             // 
-            this.btnImportData.Location = new System.Drawing.Point(345, 70);
-            this.btnImportData.Name = "btnImportData";
-            this.btnImportData.Size = new System.Drawing.Size(142, 35);
-            this.btnImportData.TabIndex = 4;
-            this.btnImportData.Text = "导入数据";
-            this.btnImportData.UseVisualStyleBackColor = true;
-            this.btnImportData.Click += new System.EventHandler(this.btnImportData_Click);
+            btnImportData.Location = new Point(345, 62);
+            btnImportData.Name = "btnImportData";
+            btnImportData.Size = new Size(142, 31);
+            btnImportData.TabIndex = 4;
+            btnImportData.Text = "导入数据";
+            btnImportData.UseVisualStyleBackColor = true;
+            btnImportData.Click += btnImportData_Click;
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(355, 108);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(56, 17);
-            this.label2.TabIndex = 5;
-            this.label2.Text = "每次间隔";
+            label2.AutoSize = true;
+            label2.Location = new Point(352, 98);
+            label2.Name = "label2";
+            label2.Size = new Size(56, 15);
+            label2.TabIndex = 5;
+            label2.Text = "每次间隔";
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(441, 108);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(20, 17);
-            this.label3.TabIndex = 6;
-            this.label3.Text = "秒";
+            label3.AutoSize = true;
+            label3.Location = new Point(438, 98);
+            label3.Name = "label3";
+            label3.Size = new Size(19, 15);
+            label3.TabIndex = 6;
+            label3.Text = "秒";
             // 
             // txtSecd
             // 
-            this.txtSecd.Location = new System.Drawing.Point(411, 105);
-            this.txtSecd.Name = "txtSecd";
-            this.txtSecd.Size = new System.Drawing.Size(32, 23);
-            this.txtSecd.TabIndex = 7;
-            this.txtSecd.Text = "120";
+            txtSecd.Location = new Point(408, 96);
+            txtSecd.Name = "txtSecd";
+            txtSecd.Size = new Size(32, 23);
+            txtSecd.TabIndex = 7;
+            txtSecd.Text = "120";
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(44, 17);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "日志：";
+            label1.AutoSize = true;
+            label1.Location = new Point(12, 8);
+            label1.Name = "label1";
+            label1.Size = new Size(37, 15);
+            label1.TabIndex = 2;
+            label1.Text = "日志：";
             // 
             // txtLog
             // 
-            this.txtLog.Location = new System.Drawing.Point(12, 29);
-            this.txtLog.Name = "txtLog";
-            this.txtLog.Size = new System.Drawing.Size(327, 409);
-            this.txtLog.TabIndex = 1;
-            this.txtLog.Text = "";
-            this.txtLog.TextChanged += new System.EventHandler(this.txtLog_TextChanged);
+            txtLog.Location = new Point(12, 26);
+            txtLog.Name = "txtLog";
+            txtLog.Size = new Size(327, 361);
+            txtLog.TabIndex = 1;
+            txtLog.Text = "";
+            txtLog.TextChanged += txtLog_TextChanged;
             // 
             // WeChatAddFriendForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(498, 450);
-            this.Controls.Add(this.txtSecd);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.btnImportData);
-            this.Controls.Add(this.lblDeviceNum);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.txtLog);
-            this.Controls.Add(this.btnAdd);
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "WeChatAddFriendForm";
-            this.ShowIcon = false;
-            this.Text = "微信添加好友";
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(498, 397);
+            Controls.Add(txtSecd);
+            Controls.Add(label3);
+            Controls.Add(label2);
+            Controls.Add(btnImportData);
+            Controls.Add(lblDeviceNum);
+            Controls.Add(label1);
+            Controls.Add(txtLog);
+            Controls.Add(btnAdd);
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "WeChatAddFriendForm";
+            ShowIcon = false;
+            Text = "微信添加好友";
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
