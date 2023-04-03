@@ -32,3 +32,5 @@ D:\src\WeChatAddFriend\obj\Debug\net6.0-windows\refint\WeChatAddFriend.dll
 D:\src\WeChatAddFriend\obj\Debug\net6.0-windows\WeChatAddFriend.pdb
 D:\src\WeChatAddFriend\obj\Debug\net6.0-windows\WeChatAddFriend.genruntimeconfig.cache
 D:\src\WeChatAddFriend\obj\Debug\net6.0-windows\ref\WeChatAddFriend.dll
+D:\src\WeChatAddFriend\bin\Debug\net6.0-windows\MaterialSkin.dll
+D:\src\WeChatAddFriend\obj\Debug\net6.0-windows\WeChatAddFriend.csproj.CopyComplete

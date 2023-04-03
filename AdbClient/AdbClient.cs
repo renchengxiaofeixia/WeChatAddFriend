@@ -915,7 +915,8 @@ namespace AdvancedSharpAdbClient
                                 attributes.Add(at.Name, at.Value);
                             }
                             Cords cord = new Cords((cords[0] + cords[2]) / 2, (cords[1] + cords[3]) / 2); // Average x1, y1, x2, y2
-                            return new Element(this, device, cord, attributes);
+                            Cords startCord = new Cords(cords[0], cords[1]);
+                            return new Element(this, device, startCord, cord, attributes);
                         }
                     }
                 }
@@ -953,7 +954,8 @@ namespace AdvancedSharpAdbClient
                                     attributes.Add(at.Name, at.Value);
                                 }
                                 Cords cord = new Cords((cords[0] + cords[2]) / 2, (cords[1] + cords[3]) / 2); // Average x1, y1, x2, y2
-                                elements[i] = new Element(this, device, cord, attributes);
+                                Cords startCord = new Cords(cords[0], cords[1]); 
+                                elements[i] = new Element(this, device, startCord, cord, attributes);
                             }
                         }
                         return elements.Length == 0 ? null : elements;

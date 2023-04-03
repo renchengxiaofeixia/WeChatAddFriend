@@ -16,6 +16,10 @@ namespace AdvancedSharpAdbClient
         /// The current device containing the element
         /// </summary>
         private DeviceData device { get; set; }
+        /// <summary>
+        /// Contains element coordinates 
+        /// </summary>
+        public Cords startCords { get; set; }
 
         /// <summary>
         /// Contains element coordinates 
@@ -34,11 +38,12 @@ namespace AdvancedSharpAdbClient
         /// <param name="device"></param>
         /// <param name="cords"></param>
         /// <param name="attributes"></param>
-        public Element(IAdbClient client, DeviceData device, Cords cords, Dictionary<string, string> attributes)
+        public Element(IAdbClient client, DeviceData device, Cords startCords, Cords cords, Dictionary<string, string> attributes)
         {
             this.client = client;
             this.device = device;
             this.cords = cords;
+            this.startCords = startCords;
             this.attributes = attributes;
         }
 

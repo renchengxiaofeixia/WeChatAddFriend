@@ -36,11 +36,14 @@
             txtSecd = new TextBox();
             label1 = new Label();
             txtLog = new RichTextBox();
+            btnSaveMoments = new Button();
+            btnSendMoments = new MaterialSkin.Controls.MaterialButton();
+            materialButton1 = new MaterialSkin.Controls.MaterialButton();
             SuspendLayout();
             // 
             // btnAdd
             // 
-            btnAdd.Location = new Point(345, 26);
+            btnAdd.Location = new Point(345, 138);
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(142, 31);
             btnAdd.TabIndex = 0;
@@ -58,7 +61,7 @@
             // 
             // btnImportData
             // 
-            btnImportData.Location = new Point(345, 62);
+            btnImportData.Location = new Point(345, 175);
             btnImportData.Name = "btnImportData";
             btnImportData.Size = new Size(142, 31);
             btnImportData.TabIndex = 4;
@@ -69,7 +72,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(352, 98);
+            label2.Location = new Point(345, 244);
             label2.Name = "label2";
             label2.Size = new Size(56, 15);
             label2.TabIndex = 5;
@@ -78,7 +81,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(438, 98);
+            label3.Location = new Point(431, 244);
             label3.Name = "label3";
             label3.Size = new Size(19, 15);
             label3.TabIndex = 6;
@@ -86,7 +89,7 @@
             // 
             // txtSecd
             // 
-            txtSecd.Location = new Point(408, 96);
+            txtSecd.Location = new Point(401, 242);
             txtSecd.Name = "txtSecd";
             txtSecd.Size = new Size(32, 23);
             txtSecd.TabIndex = 7;
@@ -95,7 +98,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(12, 8);
+            label1.Location = new Point(21, 311);
             label1.Name = "label1";
             label1.Size = new Size(37, 15);
             label1.TabIndex = 2;
@@ -103,18 +106,71 @@
             // 
             // txtLog
             // 
-            txtLog.Location = new Point(12, 26);
+            txtLog.Location = new Point(12, 336);
             txtLog.Name = "txtLog";
-            txtLog.Size = new Size(327, 361);
+            txtLog.Size = new Size(327, 51);
             txtLog.TabIndex = 1;
             txtLog.Text = "";
             txtLog.TextChanged += txtLog_TextChanged;
+            // 
+            // btnSaveMoments
+            // 
+            btnSaveMoments.Location = new Point(345, 271);
+            btnSaveMoments.Name = "btnSaveMoments";
+            btnSaveMoments.Size = new Size(102, 28);
+            btnSaveMoments.TabIndex = 8;
+            btnSaveMoments.Text = "复制朋友圈";
+            btnSaveMoments.UseVisualStyleBackColor = true;
+            btnSaveMoments.Click += btnSaveMoments_Click;
+            // 
+            // btnSendMoments
+            // 
+            btnSendMoments.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnSendMoments.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnSendMoments.Depth = 0;
+            btnSendMoments.HighEmphasis = true;
+            btnSendMoments.Icon = null;
+            btnSendMoments.Location = new Point(345, 341);
+            btnSendMoments.Margin = new Padding(4, 6, 4, 6);
+            btnSendMoments.MouseState = MaterialSkin.MouseState.HOVER;
+            btnSendMoments.Name = "btnSendMoments";
+            btnSendMoments.NoAccentTextColor = Color.Empty;
+            btnSendMoments.Size = new Size(85, 36);
+            btnSendMoments.TabIndex = 9;
+            btnSendMoments.Text = "发朋友圈";
+            btnSendMoments.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnSendMoments.UseAccentColor = false;
+            btnSendMoments.UseVisualStyleBackColor = true;
+            btnSendMoments.Click += btnSendMoments_Click;
+            // 
+            // materialButton1
+            // 
+            materialButton1.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            materialButton1.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            materialButton1.Depth = 0;
+            materialButton1.HighEmphasis = true;
+            materialButton1.Icon = null;
+            materialButton1.Location = new Point(356, 81);
+            materialButton1.Margin = new Padding(4, 6, 4, 6);
+            materialButton1.MouseState = MaterialSkin.MouseState.HOVER;
+            materialButton1.Name = "materialButton1";
+            materialButton1.NoAccentTextColor = Color.Empty;
+            materialButton1.Size = new Size(158, 36);
+            materialButton1.TabIndex = 10;
+            materialButton1.Text = "materialButton1";
+            materialButton1.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            materialButton1.UseAccentColor = false;
+            materialButton1.UseVisualStyleBackColor = true;
+            materialButton1.Click += materialButton1_Click;
             // 
             // WeChatAddFriendForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(498, 397);
+            Controls.Add(materialButton1);
+            Controls.Add(btnSendMoments);
+            Controls.Add(btnSaveMoments);
             Controls.Add(txtSecd);
             Controls.Add(label3);
             Controls.Add(label2);
@@ -127,7 +183,8 @@
             MinimizeBox = false;
             Name = "WeChatAddFriendForm";
             ShowIcon = false;
-            Text = "微信添加好友";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "微信加好友";
             ResumeLayout(false);
             PerformLayout();
         }
@@ -142,5 +199,8 @@
         private TextBox txtSecd;
         private Label label1;
         private RichTextBox txtLog;
+        private Button btnSaveMoments;
+        private MaterialSkin.Controls.MaterialButton btnSendMoments;
+        private MaterialSkin.Controls.MaterialButton materialButton1;
     }
 }
