@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace WeChatAddFriend.Tools
+namespace WeChatAddFriend
 {
     public class Log
     {
@@ -47,7 +48,7 @@ namespace WeChatAddFriend.Tools
             }
             if (!FileName.Contains("\\"))
             {
-                FileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, FileName);
+                FileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,FileName);
             }
             _writer = new LogWriter(FileName, saveLogByDay, maxByte);
             _writer.LimitSameStringWriteCount = limitSameStringWriteCount;
@@ -113,12 +114,12 @@ namespace WeChatAddFriend.Tools
             if (!text.Contains(caller) && text.Contains(path))
             {
                 text = string.Format("Message={0}\r\nBreakPoint={3}\r\ncaller={1}, file={2},line={3}\r\nStackTrace={4}",
-                    text.Trim(),
-                    caller,
-                    path,
-                    line,
-                    e.StackTrace
-                );
+					text.Trim(),
+					caller,
+					path,
+					line,
+					e.StackTrace
+				);
             }
             return text;
         }
@@ -192,5 +193,4 @@ namespace WeChatAddFriend.Tools
         }
 
     }
-
 }

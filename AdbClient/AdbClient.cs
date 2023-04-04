@@ -4,6 +4,7 @@
 
 using AdvancedSharpAdbClient.Exceptions;
 using AdvancedSharpAdbClient.Logs;
+using AdvancedSharpAdbClient.Receivers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,6 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -164,6 +166,33 @@ namespace AdvancedSharpAdbClient
 
                 return data.Select(d => DeviceData.CreateFromAdbData(d)).ToList();
             }
+        }
+
+        public void StartTcpIp(DeviceData device)
+        {
+            EnsureDevice(device);
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
+            {
+                socket.SetDevice(device);
+                socket.SendAdbRequest($"tcpip:{DefaultPort}");
+                AdbResponse response = socket.ReadAdbResponse();
+            }
+        }
+
+        public string GetDeviceIp(DeviceData device)
+        {
+            EnsureDevice(device);
+
+            var rcvr = new SerilogOutputReceiver();
+            this.ExecuteRemoteCommand("ip addr show wlan0", device, rcvr);
+
+            var ip = string.Empty;
+            if (rcvr.Output.Count > 0)
+            {
+                var mch = Regex.Match(rcvr.Output[2], "inet\\s(\\d+?\\.\\d+?\\.\\d+?\\.\\d+?)/\\d+");
+                ip = mch.Groups[1].Value;
+            }
+            return ip;
         }
 
         /// <inheritdoc/>

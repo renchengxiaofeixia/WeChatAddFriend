@@ -2,68 +2,70 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace WeChatAddFriend.Tools
+namespace WeChatAddFriend
 {
     public class LogWriter
     {
         public LogWriter(string fn, bool saveLogByDay, int maxByte)
         {
-            _start = DateTime.Now;
-            _file = new LoopSaveFile(fn, maxByte, saveLogByDay);
-            WriteLine(string.Format("\r\n============  日志启动({0})  ============", DateTime.Now.ToString()));
+            this._start = DateTime.Now;
+            this._file = new LoopSaveFile(fn, maxByte, saveLogByDay);
+            this.WriteLine(string.Format("\r\n============  日志启动({0})  ============", DateTime.Now.ToString()));
         }
 
         public void WriteEnvironmentString(string env)
         {
-            _environmentStr = env;
-            WriteLine(string.Format("{0}：程序版本={1}\r\n-------------------------------------\r\n", DateTime.Now.ToString(), env));
+            this._environmentStr = env;
+            this.WriteLine(string.Format("{0}：程序版本={1}\r\n-------------------------------------\r\n", DateTime.Now.ToString(), env));
         }
 
         public void Close(string reason)
         {
-            WriteLine(string.Format("日志关闭({1})：原因={3},持续时间={0},托管内存占用={4}MB\r\n程序版本={2}\r\n===============================\r\n", new object[]
-            {
-                (DateTime.Now - _start).TotalSeconds,
-                DateTime.Now.ToString(),
-                _environmentStr,
-                reason,
-                ((double)GC.GetTotalMemory(true) / Math.Pow(2.0, 20.0)).ToString("0.0")
-            }));
-            _file.Close();
+            this.WriteLine(string.Format("日志关闭({1})：原因={3},持续时间={0},托管内存占用={4}MB\r\n程序版本={2}\r\n===============================\r\n", new object[]
+			{
+				(DateTime.Now - this._start).TotalSeconds,
+				DateTime.Now.ToString(),
+				this._environmentStr,
+				reason,
+				((double)GC.GetTotalMemory(true) / Math.Pow(2.0, 20.0)).ToString("0.0")
+			}));
+            this._file.Close();
         }
 
         public void Clear()
         {
-            _file.Clear();
+            this._file.Clear();
         }
 
         public void Write(string text, string tag, bool writeStackTrace = false, string stackTrace = null)
         {
-            bool limitSameStringWriteCount = LimitSameStringWriteCount;
+            bool limitSameStringWriteCount = this.LimitSameStringWriteCount;
             if (limitSameStringWriteCount)
             {
-                int cnt = UpdateWriteCount(text);
+                int cnt = this.UpdateWriteCount(text);
                 if (cnt > 0 && cnt < 20 && cnt % 10 == 0)
                 {
                     text = string.Concat(new object[]
-                    {
-                        "第",
-                        cnt,
-                        "次发生该写入,超出20次将不再提示",
-                        Environment.NewLine,
-                        text
-                    });
+					{
+						"第",
+						cnt,
+						"次发生该写入,超出20次将不再提示",
+						Environment.NewLine,
+						text
+					});
                 }
                 if (cnt > 20)
                 {
                     return;
                 }
             }
-            text = string.Concat(tag, "(", DateTime.Now.ToString(), "):", text, Environment.NewLine);
+            text = string.Concat(tag,"(",DateTime.Now.ToString(),"):",text,	Environment.NewLine);
             if (writeStackTrace)
             {
                 if (string.IsNullOrEmpty(stackTrace))
@@ -72,7 +74,7 @@ namespace WeChatAddFriend.Tools
                 }
                 text = text + stackTrace + Environment.NewLine;
             }
-            _file.WriteLine(text);
+            this._file.WriteLine(text);
         }
 
         public static string GetStackTrace(int skipFrames = 1)
@@ -90,48 +92,48 @@ namespace WeChatAddFriend.Tools
 
         public void Error(string text)
         {
-            Write(text, "ERROR");
+            this.Write(text, "ERROR");
         }
 
         public void Info(string text)
         {
-            Write(text, "Info");
+            this.Write(text, "Info");
         }
 
         public void Debug(string text)
         {
-            Write(text, "Debug");
+            this.Write(text, "Debug");
         }
 
         public void Exception(string msg)
         {
-            Write(msg, "Exception");
+            this.Write(msg, "Exception");
         }
 
         private int UpdateWriteCount(string text)
         {
             int num = 0;
-            if (_wcache.ContainsKey(text))
+            if (this._wcache.ContainsKey(text))
             {
-                num = _wcache[text];
+                num = this._wcache[text];
                 num++;
             }
-            _wcache[text] = num;
+            this._wcache[text] = num;
             return num;
         }
 
         public void Assert(string msg)
         {
-            Write(msg, "Assert", false, null);
+            this.Write(msg, "Assert", false, null);
         }
 
         public void Show()
         {
             try
             {
-                if (File.Exists(_file.FileName))
+                if (File.Exists(this._file.FileName))
                 {
-                    Process.Start(_file.FileName);
+                    Process.Start(this._file.FileName);
                 }
             }
             catch
@@ -141,27 +143,27 @@ namespace WeChatAddFriend.Tools
 
         public void TimeElapse(string title, DateTime t0)
         {
-            Info(title + ",ms=" + (DateTime.Now - t0).TotalMilliseconds);
+            this.Info(title + ",ms=" + (DateTime.Now - t0).TotalMilliseconds);
         }
 
         public void WriteLine(string msg)
         {
-            _file.WriteLine(msg);
+            this._file.WriteLine(msg);
         }
 
         public void StackTrace()
         {
-            Write("", "StackTrace", true, null);
+            this.Write("", "StackTrace", true, null);
         }
 
         public void CopyTo(string dest)
         {
-            Close("复制日志");
+            this.Close("复制日志");
             if (File.Exists(dest))
             {
                 File.Delete(dest);
             }
-            File.Copy(_file.FileName, dest);
+            File.Copy(this._file.FileName, dest);
         }
 
         private LoopSaveFile _file;
@@ -185,62 +187,65 @@ namespace WeChatAddFriend.Tools
 
             public LoopSaveFile(string fn, int maxFileByte, bool saveLogByDay)
             {
-                FileName = fn;
-                _limitFileSize = maxFileByte;
-                _saveLogByDay = saveLogByDay;
-                KeepFileSizeOrBackupFileByDay();
-                _timer = new Thread(WriteLoop);
+                this.FileName = fn;
+                this._limitFileSize = maxFileByte;
+                this._saveLogByDay = saveLogByDay;
+                this.KeepFileSizeOrBackupFileByDay();
+                this._timer = new Thread(WriteLoop);
             }
 
             ~LoopSaveFile()
             {
-                Close();
+                this.Close();
             }
 
             private void WriteLoop()
             {
-                if (_cache.Count > 0)
+                while (true)
                 {
-                    try
+                    if (this._cache.Count > 0)
                     {
-                        KeepFileSizeOrBackupFileByDay();
-                        using (var streamWriter = OpenStream(true))
+                        try
                         {
-                            string value;
-                            while (_cache.Count > 0 && _cache.TryDequeue(out value))
+                            this.KeepFileSizeOrBackupFileByDay();
+                            using (StreamWriter streamWriter = this.OpenStream(true))
                             {
-                                streamWriter.WriteLine(value);
+                                string value;
+                                while (this._cache.Count > 0 && this._cache.TryDequeue(out value))
+                                {
+                                    streamWriter.WriteLine(value);
+                                }
                             }
                         }
+                        catch
+                        {
+                        }
                     }
-                    catch
-                    {
-                    }
+                    Thread.Sleep(1000);
                 }
-                Thread.Sleep(1000);
             }
 
 
             public string GetFileNameFromDate(DateTime date)
             {
-                FileInfo fileInfo = new FileInfo(FileName);
-                int length = FileName.LastIndexOf(fileInfo.Extension);
-                return FileName.Substring(0, length) + date.ToString("yyyy-MM-dd") + fileInfo.Extension;
+                FileInfo fileInfo = new FileInfo(this.FileName);
+                int length = this.FileName.LastIndexOf(fileInfo.Extension);
+                return this.FileName.Substring(0, length) + date.ToString("yyyy-MM-dd") + fileInfo.Extension;
             }
 
             private StreamWriter OpenStream(bool append)
             {
-                FileStream stream = new FileStream(FileName, append ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+                FileStream stream = new FileStream(this.FileName, append ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
                 return new StreamWriter(stream, Encoding.GetEncoding("gb2312"));
             }
 
             private void KeepFileSizeOrBackupFileByDay()
             {
-                if ((DateTime.Now - _checkFileSizeTime).TotalMinutes >= 5.0)
+                if ((DateTime.Now - this._checkFileSizeTime).TotalMinutes >= 5.0)
                 {
-                    _checkFileSizeTime = DateTime.Now;
-                    BackOldLogIfNeed();
-                    ClearFileIfNeed();
+                    this._checkFileSizeTime = DateTime.Now;
+                    this.BackOldLogIfNeed();
+                    this.ClearFileIfNeed();
                 }
             }
 
@@ -249,14 +254,14 @@ namespace WeChatAddFriend.Tools
                 bool rt = false;
                 try
                 {
-                    if (_saveLogByDay && File.Exists(FileName))
+                    if (this._saveLogByDay && File.Exists(this.FileName))
                     {
-                        var fi = new FileInfo(FileName);
+                        var fi = new FileInfo(this.FileName);
                         if (fi.CreationTime.Date != DateTime.Now.Date && fi.Length > 0L)
                         {
-                            string fileNameFromDate = GetFileNameFromDate(DateTime.Now.AddDays(-1.0));
-                            File.Copy(FileName, fileNameFromDate);
-                            File.Delete(FileName);
+                            string fileNameFromDate = this.GetFileNameFromDate(DateTime.Now.AddDays(-1.0));
+                            File.Copy(this.FileName, fileNameFromDate);
+                            File.Delete(this.FileName);
                             rt = true;
                         }
                     }
@@ -271,9 +276,9 @@ namespace WeChatAddFriend.Tools
             {
                 try
                 {
-                    if (_limitFileSize > 0 && IsFileTooBig())
+                    if (this._limitFileSize > 0 && this.IsFileTooBig())
                     {
-                        Clear();
+                        this.Clear();
                     }
                 }
                 catch
@@ -284,10 +289,10 @@ namespace WeChatAddFriend.Tools
             private bool IsFileTooBig()
             {
                 bool rt = false;
-                if (File.Exists(FileName))
+                if (File.Exists(this.FileName))
                 {
-                    var fi = new FileInfo(FileName);
-                    rt = (fi.Length > (long)_limitFileSize);
+                    var fi = new FileInfo(this.FileName);
+                    rt = (fi.Length > (long)this._limitFileSize);
                 }
                 return rt;
             }
@@ -296,8 +301,8 @@ namespace WeChatAddFriend.Tools
             {
                 try
                 {
-                    File.Delete(FileName);
-                    using (OpenStream(false))
+                    File.Delete(this.FileName);
+                    using (this.OpenStream(false))
                     {
                     }
                 }
@@ -308,15 +313,14 @@ namespace WeChatAddFriend.Tools
 
             public void WriteLine(string text)
             {
-                _cache.Enqueue(text);
+                this._cache.Enqueue(text);
             }
 
             public void Close()
             {
-                WriteLoop();
+                this.WriteLoop();
             }
 
         }
     }
-
 }

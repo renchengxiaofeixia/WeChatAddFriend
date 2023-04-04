@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             btnAdd = new Button();
             lblDeviceNum = new Label();
             btnImportData = new Button();
@@ -36,14 +37,23 @@
             txtSecd = new TextBox();
             label1 = new Label();
             txtLog = new RichTextBox();
-            btnSaveMoments = new Button();
-            btnSendMoments = new MaterialSkin.Controls.MaterialButton();
-            materialButton1 = new MaterialSkin.Controls.MaterialButton();
+            btnForwardMoments = new Button();
+            txtWeChatNo = new TextBox();
+            label4 = new Label();
+            dgPhones = new DataGridView();
+            phoneSerial = new DataGridViewTextBoxColumn();
+            phoneName = new DataGridViewTextBoxColumn();
+            phoneState = new DataGridViewTextBoxColumn();
+            ctxMenu = new ContextMenuStrip(components);
+            转为WIFI连接ToolStripMenuItem = new ToolStripMenuItem();
+            断开连接ToolStripMenuItem = new ToolStripMenuItem();
+            ((System.ComponentModel.ISupportInitialize)dgPhones).BeginInit();
+            ctxMenu.SuspendLayout();
             SuspendLayout();
             // 
             // btnAdd
             // 
-            btnAdd.Location = new Point(345, 138);
+            btnAdd.Location = new Point(345, 26);
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(142, 31);
             btnAdd.TabIndex = 0;
@@ -61,7 +71,7 @@
             // 
             // btnImportData
             // 
-            btnImportData.Location = new Point(345, 175);
+            btnImportData.Location = new Point(345, 63);
             btnImportData.Name = "btnImportData";
             btnImportData.Size = new Size(142, 31);
             btnImportData.TabIndex = 4;
@@ -72,7 +82,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(345, 244);
+            label2.Location = new Point(345, 97);
             label2.Name = "label2";
             label2.Size = new Size(56, 15);
             label2.TabIndex = 5;
@@ -81,7 +91,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(431, 244);
+            label3.Location = new Point(431, 97);
             label3.Name = "label3";
             label3.Size = new Size(19, 15);
             label3.TabIndex = 6;
@@ -89,7 +99,7 @@
             // 
             // txtSecd
             // 
-            txtSecd.Location = new Point(401, 242);
+            txtSecd.Location = new Point(401, 95);
             txtSecd.Name = "txtSecd";
             txtSecd.Size = new Size(32, 23);
             txtSecd.TabIndex = 7;
@@ -98,7 +108,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(21, 311);
+            label1.Location = new Point(12, 8);
             label1.Name = "label1";
             label1.Size = new Size(37, 15);
             label1.TabIndex = 2;
@@ -106,71 +116,101 @@
             // 
             // txtLog
             // 
-            txtLog.Location = new Point(12, 336);
+            txtLog.Location = new Point(12, 26);
             txtLog.Name = "txtLog";
-            txtLog.Size = new Size(327, 51);
+            txtLog.Size = new Size(327, 286);
             txtLog.TabIndex = 1;
             txtLog.Text = "";
             txtLog.TextChanged += txtLog_TextChanged;
             // 
-            // btnSaveMoments
+            // btnForwardMoments
             // 
-            btnSaveMoments.Location = new Point(345, 271);
-            btnSaveMoments.Name = "btnSaveMoments";
-            btnSaveMoments.Size = new Size(102, 28);
-            btnSaveMoments.TabIndex = 8;
-            btnSaveMoments.Text = "复制朋友圈";
-            btnSaveMoments.UseVisualStyleBackColor = true;
-            btnSaveMoments.Click += btnSaveMoments_Click;
+            btnForwardMoments.Location = new Point(391, 153);
+            btnForwardMoments.Name = "btnForwardMoments";
+            btnForwardMoments.Size = new Size(102, 28);
+            btnForwardMoments.TabIndex = 10;
+            btnForwardMoments.Text = "转发朋友圈";
+            btnForwardMoments.UseVisualStyleBackColor = true;
+            btnForwardMoments.Click += btnForwardMoments_Click;
             // 
-            // btnSendMoments
+            // txtWeChatNo
             // 
-            btnSendMoments.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnSendMoments.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
-            btnSendMoments.Depth = 0;
-            btnSendMoments.HighEmphasis = true;
-            btnSendMoments.Icon = null;
-            btnSendMoments.Location = new Point(345, 341);
-            btnSendMoments.Margin = new Padding(4, 6, 4, 6);
-            btnSendMoments.MouseState = MaterialSkin.MouseState.HOVER;
-            btnSendMoments.Name = "btnSendMoments";
-            btnSendMoments.NoAccentTextColor = Color.Empty;
-            btnSendMoments.Size = new Size(85, 36);
-            btnSendMoments.TabIndex = 9;
-            btnSendMoments.Text = "发朋友圈";
-            btnSendMoments.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            btnSendMoments.UseAccentColor = false;
-            btnSendMoments.UseVisualStyleBackColor = true;
-            btnSendMoments.Click += btnSendMoments_Click;
+            txtWeChatNo.Location = new Point(391, 124);
+            txtWeChatNo.Name = "txtWeChatNo";
+            txtWeChatNo.Size = new Size(155, 23);
+            txtWeChatNo.TabIndex = 11;
+            txtWeChatNo.Text = "wangyaqin1991";
             // 
-            // materialButton1
+            // label4
             // 
-            materialButton1.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            materialButton1.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
-            materialButton1.Depth = 0;
-            materialButton1.HighEmphasis = true;
-            materialButton1.Icon = null;
-            materialButton1.Location = new Point(356, 81);
-            materialButton1.Margin = new Padding(4, 6, 4, 6);
-            materialButton1.MouseState = MaterialSkin.MouseState.HOVER;
-            materialButton1.Name = "materialButton1";
-            materialButton1.NoAccentTextColor = Color.Empty;
-            materialButton1.Size = new Size(158, 36);
-            materialButton1.TabIndex = 10;
-            materialButton1.Text = "materialButton1";
-            materialButton1.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            materialButton1.UseAccentColor = false;
-            materialButton1.UseVisualStyleBackColor = true;
-            materialButton1.Click += materialButton1_Click;
+            label4.AutoSize = true;
+            label4.Location = new Point(343, 127);
+            label4.Name = "label4";
+            label4.Size = new Size(43, 15);
+            label4.TabIndex = 12;
+            label4.Text = "微信号";
+            // 
+            // dgPhones
+            // 
+            dgPhones.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgPhones.Columns.AddRange(new DataGridViewColumn[] { phoneSerial, phoneName, phoneState });
+            dgPhones.ContextMenuStrip = ctxMenu;
+            dgPhones.Location = new Point(345, 187);
+            dgPhones.Name = "dgPhones";
+            dgPhones.RowTemplate.Height = 25;
+            dgPhones.Size = new Size(348, 209);
+            dgPhones.TabIndex = 13;
+            // 
+            // phoneSerial
+            // 
+            phoneSerial.DataPropertyName = "Serial";
+            phoneSerial.HeaderText = "Serial";
+            phoneSerial.Name = "phoneSerial";
+            phoneSerial.ReadOnly = true;
+            // 
+            // phoneName
+            // 
+            phoneName.DataPropertyName = "Name";
+            phoneName.HeaderText = "Name";
+            phoneName.Name = "phoneName";
+            phoneName.ReadOnly = true;
+            // 
+            // phoneState
+            // 
+            phoneState.DataPropertyName = "State";
+            phoneState.HeaderText = "State";
+            phoneState.Name = "phoneState";
+            phoneState.ReadOnly = true;
+            // 
+            // ctxMenu
+            // 
+            ctxMenu.Items.AddRange(new ToolStripItem[] { 转为WIFI连接ToolStripMenuItem, 断开连接ToolStripMenuItem });
+            ctxMenu.Name = "ctxMenu";
+            ctxMenu.Size = new Size(181, 70);
+            // 
+            // 转为WIFI连接ToolStripMenuItem
+            // 
+            转为WIFI连接ToolStripMenuItem.Name = "转为WIFI连接ToolStripMenuItem";
+            转为WIFI连接ToolStripMenuItem.Size = new Size(180, 22);
+            转为WIFI连接ToolStripMenuItem.Text = "转为WIFI连接";
+            转为WIFI连接ToolStripMenuItem.Click += 转为WIFI连接ToolStripMenuItem_Click;
+            // 
+            // 断开连接ToolStripMenuItem
+            // 
+            断开连接ToolStripMenuItem.Name = "断开连接ToolStripMenuItem";
+            断开连接ToolStripMenuItem.Size = new Size(180, 22);
+            断开连接ToolStripMenuItem.Text = "断开WIFI连接";
+            断开连接ToolStripMenuItem.Click += 断开连接ToolStripMenuItem_Click;
             // 
             // WeChatAddFriendForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(498, 397);
-            Controls.Add(materialButton1);
-            Controls.Add(btnSendMoments);
-            Controls.Add(btnSaveMoments);
+            ClientSize = new Size(770, 465);
+            Controls.Add(dgPhones);
+            Controls.Add(label4);
+            Controls.Add(txtWeChatNo);
+            Controls.Add(btnForwardMoments);
             Controls.Add(txtSecd);
             Controls.Add(label3);
             Controls.Add(label2);
@@ -185,6 +225,8 @@
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "微信加好友";
+            ((System.ComponentModel.ISupportInitialize)dgPhones).EndInit();
+            ctxMenu.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -199,8 +241,15 @@
         private TextBox txtSecd;
         private Label label1;
         private RichTextBox txtLog;
-        private Button btnSaveMoments;
-        private MaterialSkin.Controls.MaterialButton btnSendMoments;
-        private MaterialSkin.Controls.MaterialButton materialButton1;
+        private Button btnForwardMoments;
+        private TextBox txtWeChatNo;
+        private Label label4;
+        private DataGridView dgPhones;
+        private ContextMenuStrip ctxMenu;
+        private DataGridViewTextBoxColumn phoneSerial;
+        private DataGridViewTextBoxColumn phoneName;
+        private DataGridViewTextBoxColumn phoneState;
+        private ToolStripMenuItem 转为WIFI连接ToolStripMenuItem;
+        private ToolStripMenuItem 断开连接ToolStripMenuItem;
     }
 }
