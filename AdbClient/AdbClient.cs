@@ -189,7 +189,7 @@ namespace AdvancedSharpAdbClient
             var ip = string.Empty;
             if (rcvr.Output.Count > 0)
             {
-                var mch = Regex.Match(rcvr.Output[2], "inet\\s(\\d+?\\.\\d+?\\.\\d+?\\.\\d+?)/\\d+");
+                var mch = Regex.Match(string.Join(",",rcvr.Output), "inet\\s(\\d+?\\.\\d+?\\.\\d+?\\.\\d+?)/\\d+");
                 ip = mch.Groups[1].Value;
             }
             return ip;

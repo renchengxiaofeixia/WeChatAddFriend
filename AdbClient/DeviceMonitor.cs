@@ -335,8 +335,11 @@ namespace AdvancedSharpAdbClient
                     }
                     else
                     {
-                        existingDevice.State = device.State;
-                        OnDeviceChanged(new DeviceDataEventArgs(existingDevice));
+                        if (existingDevice.State != device.State)
+                        {
+                            existingDevice.State = device.State;
+                            OnDeviceChanged(new DeviceDataEventArgs(existingDevice));
+                        }
                     }
                 }
 

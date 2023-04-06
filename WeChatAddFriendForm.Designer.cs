@@ -30,11 +30,10 @@
         {
             components = new System.ComponentModel.Container();
             btnAdd = new Button();
-            lblDeviceNum = new Label();
             btnImportData = new Button();
             label2 = new Label();
             label3 = new Label();
-            txtSecd = new TextBox();
+            txtMint = new TextBox();
             label1 = new Label();
             txtLog = new RichTextBox();
             btnForwardMoments = new Button();
@@ -47,33 +46,29 @@
             ctxMenu = new ContextMenuStrip(components);
             转为WIFI连接ToolStripMenuItem = new ToolStripMenuItem();
             断开连接ToolStripMenuItem = new ToolStripMenuItem();
+            txtHour = new TextBox();
+            label5 = new Label();
+            label6 = new Label();
+            lblDeviceNum = new Label();
             ((System.ComponentModel.ISupportInitialize)dgPhones).BeginInit();
             ctxMenu.SuspendLayout();
             SuspendLayout();
             // 
             // btnAdd
             // 
-            btnAdd.Location = new Point(345, 26);
+            btnAdd.Location = new Point(12, 10);
             btnAdd.Name = "btnAdd";
-            btnAdd.Size = new Size(142, 31);
+            btnAdd.Size = new Size(100, 31);
             btnAdd.TabIndex = 0;
-            btnAdd.Text = "开始添加";
+            btnAdd.Text = "开始加好友";
             btnAdd.UseVisualStyleBackColor = true;
             btnAdd.Click += btnAdd_Click;
             // 
-            // lblDeviceNum
-            // 
-            lblDeviceNum.AutoSize = true;
-            lblDeviceNum.Location = new Point(103, 8);
-            lblDeviceNum.Name = "lblDeviceNum";
-            lblDeviceNum.Size = new Size(0, 15);
-            lblDeviceNum.TabIndex = 3;
-            // 
             // btnImportData
             // 
-            btnImportData.Location = new Point(345, 63);
+            btnImportData.Location = new Point(123, 10);
             btnImportData.Name = "btnImportData";
-            btnImportData.Size = new Size(142, 31);
+            btnImportData.Size = new Size(100, 31);
             btnImportData.TabIndex = 4;
             btnImportData.Text = "导入数据";
             btnImportData.UseVisualStyleBackColor = true;
@@ -82,33 +77,34 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(345, 97);
+            label2.Location = new Point(12, 52);
             label2.Name = "label2";
-            label2.Size = new Size(56, 15);
+            label2.Size = new Size(80, 15);
             label2.TabIndex = 5;
-            label2.Text = "每次间隔";
+            label2.Text = "每次加人间隔";
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(431, 97);
+            label3.Location = new Point(129, 53);
             label3.Name = "label3";
-            label3.Size = new Size(19, 15);
+            label3.Size = new Size(32, 15);
             label3.TabIndex = 6;
-            label3.Text = "秒";
+            label3.Text = "分钟";
             // 
-            // txtSecd
+            // txtMint
             // 
-            txtSecd.Location = new Point(401, 95);
-            txtSecd.Name = "txtSecd";
-            txtSecd.Size = new Size(32, 23);
-            txtSecd.TabIndex = 7;
-            txtSecd.Text = "120";
+            txtMint.Location = new Point(98, 49);
+            txtMint.Name = "txtMint";
+            txtMint.Size = new Size(23, 23);
+            txtMint.TabIndex = 7;
+            txtMint.Text = "10";
+            txtMint.TextChanged += txtMint_TextChanged;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(12, 8);
+            label1.Location = new Point(584, 11);
             label1.Name = "label1";
             label1.Size = new Size(37, 15);
             label1.TabIndex = 2;
@@ -116,49 +112,50 @@
             // 
             // txtLog
             // 
-            txtLog.Location = new Point(12, 26);
+            txtLog.BorderStyle = BorderStyle.FixedSingle;
+            txtLog.Location = new Point(584, 29);
             txtLog.Name = "txtLog";
-            txtLog.Size = new Size(327, 286);
+            txtLog.Size = new Size(484, 361);
             txtLog.TabIndex = 1;
             txtLog.Text = "";
             txtLog.TextChanged += txtLog_TextChanged;
             // 
             // btnForwardMoments
             // 
-            btnForwardMoments.Location = new Point(391, 153);
+            btnForwardMoments.Location = new Point(436, 39);
             btnForwardMoments.Name = "btnForwardMoments";
             btnForwardMoments.Size = new Size(102, 28);
             btnForwardMoments.TabIndex = 10;
-            btnForwardMoments.Text = "转发朋友圈";
+            btnForwardMoments.Text = "开始发圈";
             btnForwardMoments.UseVisualStyleBackColor = true;
             btnForwardMoments.Click += btnForwardMoments_Click;
             // 
             // txtWeChatNo
             // 
-            txtWeChatNo.Location = new Point(391, 124);
+            txtWeChatNo.Location = new Point(383, 10);
             txtWeChatNo.Name = "txtWeChatNo";
             txtWeChatNo.Size = new Size(155, 23);
             txtWeChatNo.TabIndex = 11;
             txtWeChatNo.Text = "wangyaqin1991";
+            txtWeChatNo.TextChanged += txtWeChatNo_TextChanged;
             // 
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(343, 127);
+            label4.Location = new Point(260, 13);
             label4.Name = "label4";
-            label4.Size = new Size(43, 15);
+            label4.Size = new Size(117, 15);
             label4.TabIndex = 12;
-            label4.Text = "微信号";
+            label4.Text = "转发朋友圈的微信号";
             // 
             // dgPhones
             // 
             dgPhones.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgPhones.Columns.AddRange(new DataGridViewColumn[] { phoneSerial, phoneName, phoneState });
-            dgPhones.ContextMenuStrip = ctxMenu;
-            dgPhones.Location = new Point(345, 187);
+            dgPhones.Location = new Point(12, 86);
             dgPhones.Name = "dgPhones";
             dgPhones.RowTemplate.Height = 25;
-            dgPhones.Size = new Size(348, 209);
+            dgPhones.Size = new Size(554, 304);
             dgPhones.TabIndex = 13;
             // 
             // phoneSerial
@@ -186,32 +183,70 @@
             // 
             ctxMenu.Items.AddRange(new ToolStripItem[] { 转为WIFI连接ToolStripMenuItem, 断开连接ToolStripMenuItem });
             ctxMenu.Name = "ctxMenu";
-            ctxMenu.Size = new Size(181, 70);
+            ctxMenu.Size = new Size(149, 48);
             // 
             // 转为WIFI连接ToolStripMenuItem
             // 
             转为WIFI连接ToolStripMenuItem.Name = "转为WIFI连接ToolStripMenuItem";
-            转为WIFI连接ToolStripMenuItem.Size = new Size(180, 22);
+            转为WIFI连接ToolStripMenuItem.Size = new Size(148, 22);
             转为WIFI连接ToolStripMenuItem.Text = "转为WIFI连接";
             转为WIFI连接ToolStripMenuItem.Click += 转为WIFI连接ToolStripMenuItem_Click;
             // 
             // 断开连接ToolStripMenuItem
             // 
             断开连接ToolStripMenuItem.Name = "断开连接ToolStripMenuItem";
-            断开连接ToolStripMenuItem.Size = new Size(180, 22);
+            断开连接ToolStripMenuItem.Size = new Size(148, 22);
             断开连接ToolStripMenuItem.Text = "断开WIFI连接";
             断开连接ToolStripMenuItem.Click += 断开连接ToolStripMenuItem_Click;
+            // 
+            // txtHour
+            // 
+            txtHour.Location = new Point(345, 44);
+            txtHour.Name = "txtHour";
+            txtHour.Size = new Size(23, 23);
+            txtHour.TabIndex = 16;
+            txtHour.Text = "2";
+            txtHour.TextChanged += txtHour_TextChanged;
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new Point(371, 47);
+            label5.Name = "label5";
+            label5.Size = new Size(32, 15);
+            label5.TabIndex = 15;
+            label5.Text = "小时";
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Location = new Point(259, 47);
+            label6.Name = "label6";
+            label6.Size = new Size(81, 15);
+            label6.TabIndex = 14;
+            label6.Text = "每次发圈间隔";
+            // 
+            // lblDeviceNum
+            // 
+            lblDeviceNum.AutoSize = true;
+            lblDeviceNum.Location = new Point(675, 11);
+            lblDeviceNum.Name = "lblDeviceNum";
+            lblDeviceNum.Size = new Size(0, 15);
+            lblDeviceNum.TabIndex = 3;
             // 
             // WeChatAddFriendForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(770, 465);
+            ClientSize = new Size(1073, 412);
+            Controls.Add(txtHour);
+            Controls.Add(label5);
+            Controls.Add(label6);
             Controls.Add(dgPhones);
             Controls.Add(label4);
             Controls.Add(txtWeChatNo);
             Controls.Add(btnForwardMoments);
-            Controls.Add(txtSecd);
+            Controls.Add(txtMint);
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(btnImportData);
@@ -219,6 +254,7 @@
             Controls.Add(label1);
             Controls.Add(txtLog);
             Controls.Add(btnAdd);
+            DoubleBuffered = true;
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "WeChatAddFriendForm";
@@ -234,11 +270,10 @@
         #endregion
 
         private Button btnAdd;
-        private Label lblDeviceNum;
         private Button btnImportData;
         private Label label2;
         private Label label3;
-        private TextBox txtSecd;
+        private TextBox txtMint;
         private Label label1;
         private RichTextBox txtLog;
         private Button btnForwardMoments;
@@ -251,5 +286,9 @@
         private DataGridViewTextBoxColumn phoneState;
         private ToolStripMenuItem 转为WIFI连接ToolStripMenuItem;
         private ToolStripMenuItem 断开连接ToolStripMenuItem;
+        private TextBox txtHour;
+        private Label label5;
+        private Label label6;
+        private Label lblDeviceNum;
     }
 }

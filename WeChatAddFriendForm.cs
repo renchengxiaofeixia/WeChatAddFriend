@@ -1,9 +1,11 @@
 ﻿using AdvancedSharpAdbClient;
 using AdvancedSharpAdbClient.DeviceCommands;
 using AdvancedSharpAdbClient.Receivers;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -17,8 +19,11 @@ namespace WeChatAddFriend
         public static AdbServer srv;
         public static readonly string ADBPath = "platform-tools\\adb.exe";
         public static int addFriendTotalCount = 0;
-
         public List<string> importPhoneNos { get; set; }
+
+        DeviceMonitor monitor;
+
+        Params appParams;
 
         public WeChatAddFriendForm()
         {
@@ -28,74 +33,81 @@ namespace WeChatAddFriend
             dgPhones.AutoGenerateColumns = false;
         }
 
-        private void WeChatAddFriendForm_Load(object? sender, EventArgs e)
+        private async void WeChatAddFriendForm_Load(object? sender, EventArgs e)
         {
-            srv = new AdbServer();
-            if (!srv.GetStatus().IsRunning)
-            {
-                srv.StartServer(ADBPath, true);
-            }
-            adbClient = new AdbClient();
-            var t = new Thread(() =>
-            {
-                while (true)
-                {
-                    if (adbClient != null)
-                    {
-                        this.InvokeOnUiThreadIfRequired(() =>
-                        {
-                            try
-                            {
-                                var devices = adbClient.GetDevices();
-                                var connectNum = devices.Count(k => k.State == DeviceState.Online);
-                                lblDeviceNum.Text = $"连接数:（{connectNum}）";
-                                dgPhones.DataSource = devices;
-                            }
-                            catch
-                            {
+            var paramFn = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appParams");            
+            appParams = File.Exists(paramFn) ? JsonSerializer.Deserialize<Params>(File.ReadAllText(paramFn)) : new Params();
 
-                            }
-                            finally
-                            {
-                            }
-                        });
-                    }
-                    Thread.Sleep(10000);
+            txtWeChatNo.Text = appParams.ForwardMomentsWeChatNo;
+            txtHour.Text = appParams.ForwardMomentsWaitHour.ToString();
+            txtMint.Text = appParams.AddFriendWaitMinute.ToString();
+
+            await Task.Run(() =>
+            {
+                //KillProcess("adb");
+                StopProcess("5037");
+                StopProcess("5555");
+                StopProcess("62001");
+                StopProcess("21503");
+                StopProcess("5554");
+
+                srv = new AdbServer();
+                if (!srv.GetStatus().IsRunning)
+                {
+                    srv.StartServer(ADBPath, true);
                 }
+                adbClient = new AdbClient();
+
+                var t = new Thread(() =>
+                {
+                    while (true)
+                    {
+                        try
+                        {
+                            UpdateDevices(adbClient.GetDevices());
+                        }
+                        catch (Exception ex) { }
+
+                        Thread.Sleep(2000);
+                    }
+                });
+                t.IsBackground = true;
+                t.Start();
+
             });
-            t.IsBackground = true;
-            t.Start();
         }
 
         private async void btnAdd_Click(object sender, EventArgs e)
         {
-            addFriendTotalCount = 0;
-
-            var devices = adbClient.GetDevices().Where(k => k.State == DeviceState.Online).ToList();
-            var avgPhoneNoCnt = importPhoneNos.Count() / adbClient.GetDevices().Count();
-
-            var idx = 0;
-            var tasks = new List<Task>();
-            while (idx < devices.Count)
+            await Task.Run(async () =>
             {
-                var task = AddFriendTask(devices[idx], importPhoneNos.Skip(idx * avgPhoneNoCnt).Take(avgPhoneNoCnt).ToList());
-                tasks.Add(task);
-                idx++;
-            }
+                addFriendTotalCount = 0;
+                if (adbClient == null) return;
+                var devices = adbClient.GetDevices();
+                if (devices == null) return;
+                devices = devices.Where(k => k.State == DeviceState.Online).ToList();
+                var avgPhoneNoCnt = importPhoneNos.Count() / adbClient.GetDevices().Count();
 
-            await Task.WhenAll(tasks);
+                var idx = 0;
+                var tasks = new List<Task>();
+                while (idx < devices.Count)
+                {
+                    var task = AddFriendTask(devices[idx], importPhoneNos.Skip(idx * avgPhoneNoCnt).Take(avgPhoneNoCnt).ToList());
+                    tasks.Add(task);
+                    idx++;
+                }
+
+                await Task.WhenAll(tasks);
+            });
         }
 
         private async Task StartWeChat(DeviceData d)
         {
-            
             //启动微信
             adbClient.StartApp(d, "com.tencent.mm");
-
             //回到首页
             await BackWeChatHome(d);
         }
-
 
         public async Task AddFriendTask(DeviceData d, List<string> phoneNos)
         {
@@ -200,17 +212,20 @@ namespace WeChatAddFriend
                     adbClient.Click(d, add.cords);
                     await Task.Delay(1000);
                 }
+
+                PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} 添加手机号:-{phoneNos[idx]}");
+
                 //返回
                 adbClient.BackBtn(d);
 
-                int.TryParse(txtSecd.Text.Trim(), out var secd);
-                await Task.Delay(secd * 1000);
+                int.TryParse(txtMint.Text.Trim(), out var min);
+                //await Task.Delay(min * 60 * 1000);
+
+                SleepWithDoEvent(min * 60 * 1000);
 
                 adbClient.BackBtn(d);
 
                 addFriendTotalCount++;
-
-                PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} add phone ---{phoneNos[idx]}");
 
                 idx++;
             }
@@ -231,7 +246,7 @@ namespace WeChatAddFriend
         {
             this.InvokeOnUiThreadIfRequired(() =>
             {
-                txtLog.Text += "\n" + logtxt;
+                txtLog.Text += string.IsNullOrEmpty(txtLog.Text.Trim()) ? logtxt : "\n" + logtxt;
             });
         }
 
@@ -240,7 +255,6 @@ namespace WeChatAddFriend
             txtLog.SelectionStart = txtLog.Text.Length;
             txtLog.ScrollToCaret();
         }
-
 
         private async Task BackWeChatHome(DeviceData d)
         {
@@ -262,16 +276,22 @@ namespace WeChatAddFriend
         /// <returns></returns>
         private async void btnForwardMoments_Click(object sender, EventArgs e)
         {
-            var devices = adbClient.GetDevices();
-            var idx = 0;
-            var tasks = new List<Task>();
-            while (idx < devices.Count())
+            await Task.Run(async () =>
             {
-                tasks.Add(ForwardMoments(devices[idx], txtWeChatNo.Text.Trim()));
-                idx++;
-            }
+                if (adbClient == null) return;
+                var devices = adbClient.GetDevices();
+                if (devices == null) return;
+                devices = devices.Where(k => k.State == DeviceState.Online).ToList();
+                var idx = 0;
+                var tasks = new List<Task>();
+                while (idx < devices.Count())
+                {
+                    tasks.Add(ForwardMoments(devices[idx], txtWeChatNo.Text.Trim()));
+                    idx++;
+                }
 
-            await Task.WhenAll(tasks);
+                await Task.WhenAll(tasks);
+            });
         }
 
         /// <summary>
@@ -285,6 +305,7 @@ namespace WeChatAddFriend
             await StartWeChat(d);
 
             var savePicCount = 0;
+            var hasVideo = false;
             await BackWeChatHome(d);
 
             var friendsTabBar = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/f2s' and @text='通讯录']/..", TimeSpan.FromSeconds(2));
@@ -372,36 +393,58 @@ namespace WeChatAddFriend
 
             //保存朋友圈图片
             var pics = adbClient.FindElements(d, "//node[@content-desc='图片']", TimeSpan.FromSeconds(2));
-            savePicCount = pics.Count();
-            var idx = 0;
-            while (idx < pics.Count())
+            if (pics != null && pics.Count() > 0)
             {
-                var p = pics[idx];
-                if (idx == 0)
+                savePicCount = pics.Count();
+                var idx = 0;
+                while (idx < pics.Count())
                 {
-                    adbClient.Click(d, p.cords);
+                    var p = pics[idx];
+                    if (idx == 0)
+                    {
+                        adbClient.Click(d, p.cords);
+                        await Task.Delay(1000);
+                    }
+
+                    //长按图片弹出  保存按钮
+                    adbClient.Swipe(d, p, p, 2000);
                     await Task.Delay(1000);
-                }
 
-                //长按图片弹出  保存按钮
-                adbClient.Swipe(d, p, p, 2000);
-                await Task.Delay(1000);
+                    //点击保存图片
+                    var savePicBtn = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/knx' and @text='保存图片']", TimeSpan.FromSeconds(2));
+                    if (savePicBtn != null)
+                    {
+                        adbClient.Click(d, savePicBtn.cords);
+                        await Task.Delay(2000);
+                    }
 
-                //点击保存图片
-                var savePicBtn = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/knx' and @text='保存图片']", TimeSpan.FromSeconds(2));
-                if (savePicBtn != null)
-                {
-                    adbClient.Click(d, savePicBtn.cords);
+                    //左滑
+                    adbClient.Swipe(d, p.cords.x, p.cords.y, 0, p.cords.y, 150);
                     await Task.Delay(2000);
+
+                    idx++;
                 }
-
-                //左滑
-                adbClient.Swipe(d, p.cords.x, p.cords.y, 0, p.cords.y, 150);
-                await Task.Delay(2000);
-
-                idx++;
             }
 
+            var video = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/b47' and @content-desc='视频']", TimeSpan.FromSeconds(2));
+            if (video != null)
+            {
+                hasVideo = true;
+                adbClient.Click(d, video.cords);
+                await Task.Delay(5000);
+
+                //长按图片弹出  保存按钮
+                adbClient.Swipe(d, video, video, 2000);
+                await Task.Delay(2000);
+
+                //点击保存视频
+                var saveVideoBtn = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/knx' and @text='保存视频']", TimeSpan.FromSeconds(2));
+                if (saveVideoBtn != null)
+                {
+                    adbClient.Click(d, saveVideoBtn.cords);
+                    await Task.Delay(5000);
+                }
+            }
 
             await BackWeChatHome(d);
 
@@ -421,45 +464,88 @@ namespace WeChatAddFriend
             }
 
             add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/eo' and @content-desc='拍照分享']", TimeSpan.FromSeconds(2));
-            if (add != null)
+
+            if (savePicCount > 0)
             {
-                adbClient.Click(d, add.cords);
-                await Task.Delay(1000);
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
+                }
+
+                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/knx' and @text='从相册选择']", TimeSpan.FromSeconds(2));
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
+                }
+
+                //获取相册里的图片
+                var picChks = adbClient.FindElements(d, "//node[@resource-id='com.tencent.mm:id/gpy']", TimeSpan.FromSeconds(2));
+                var idx = 0;
+                while (idx < savePicCount)
+                {
+                    var chk = picChks[idx];
+                    adbClient.Click(d, chk.startCords);
+                    await Task.Delay(300);
+                    idx++;
+                }
+
+                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/en' and @text='完成']", TimeSpan.FromSeconds(2));
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
+                }
+
+                //完成图片选择
+                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/en']", TimeSpan.FromSeconds(2));
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
+                }
             }
-
-            add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/knx' and @text='从相册选择']", TimeSpan.FromSeconds(2));
-            if (add != null)
+            else if (hasVideo)
             {
-                adbClient.Click(d, add.cords);
-                await Task.Delay(1000);
-            }
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
+                }
 
+                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/knx' and @text='从相册选择']", TimeSpan.FromSeconds(2));
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
+                }
 
-
-            //获取相册里的图片
-            var picChks = adbClient.FindElements(d, "//node[@resource-id='com.tencent.mm:id/gpy']", TimeSpan.FromSeconds(2));
-
-            idx = 0;
-            while (idx < savePicCount)
-            {
-                var chk = picChks[idx];
+                //获取相册里的图片 CheckBox
+                var videoChks = adbClient.FindElements(d, "//node[@resource-id='com.tencent.mm:id/gpy']", TimeSpan.FromSeconds(2));
+                var chk = videoChks[0];
                 adbClient.Click(d, chk.startCords);
                 await Task.Delay(300);
-                idx++;
-            }
 
-            add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/en' and @text='完成']", TimeSpan.FromSeconds(2));
-            if (add != null)
-            {
-                adbClient.Click(d, add.cords);
-                await Task.Delay(1000);
-            }
+                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/en' and @text='完成']", TimeSpan.FromSeconds(2));
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
+                }
 
-            //完成图片选择
-            add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/en']", TimeSpan.FromSeconds(2));
-            if (add != null)
+                //视频第二次点完成
+                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/cco' and @text='完成']", TimeSpan.FromSeconds(2));
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
+                }
+            }
+            else
             {
-                adbClient.Click(d, add.cords);
+                //长按拍照分享按钮,发纯文字朋友圈
+                adbClient.Swipe(d, add, add, 2000);
                 await Task.Delay(1000);
             }
 
@@ -485,8 +571,12 @@ namespace WeChatAddFriend
                 await Task.Delay(1000);
             }
 
-        }
 
+            int.TryParse(txtHour.Text.Trim(), out var hour);
+            //await Task.Delay(hour * 60  * 60 * 1000);
+
+            SleepWithDoEvent(hour * 60 * 60 * 1000);
+        }
 
         private async void btnSaveMoments_Click(object sender, EventArgs e)
         {
@@ -719,8 +809,162 @@ namespace WeChatAddFriend
         {
             var d = dgPhones.CurrentRow.DataBoundItem as DeviceData;
             var ip = adbClient.GetDeviceIp(d);
-            adbClient.Disconnect(new DnsEndPoint(ip,AdbClient.DefaultPort));
+            adbClient.Disconnect(new DnsEndPoint(ip, AdbClient.DefaultPort));
         }
+
+        public void KillProcess(string processName)
+        {
+            try
+            {
+                foreach (Process process in Process.GetProcessesByName(processName))
+                {
+                    if (!process.CloseMainWindow())
+                    {
+                        process.Kill();
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        private async void UpdateDevices(List<DeviceData> devices)
+        {
+            var idx = 0;
+            while (idx < devices.Count)
+            {
+                var device = devices[idx++];
+                var ip = string.Empty;
+                if (!device.Serial.EndsWith(":5555") && device.State == DeviceState.Online)
+                {
+                    ip = adbClient.GetDeviceIp(device);
+                    if (!devices.Any(d => d.Serial.StartsWith(ip)))
+                    {
+                        device.Name = ip;
+                        await Task.Run(() =>
+                        {
+                            if (!string.IsNullOrEmpty(ip) && !devices.Any(d => d.Serial.StartsWith(ip)))
+                            {
+                                adbClient.StartTcpIp(device);
+                                adbClient.Connect(ip);
+                            }
+                        });
+                    }
+                    if (!string.IsNullOrEmpty(ip))
+                    {
+                        device.Name = ip;
+                    }
+                }
+            }
+
+            var dvs = dgPhones.DataSource as List<DeviceData>;
+            dvs = dvs ?? new List<DeviceData>();
+            devices = devices.Where(k => k.State == DeviceState.Online).ToList();
+            var diffCount = devices.ExceptBy(dvs.Select(k => k.Serial), d => d.Serial).Count();
+            if (dvs == null || diffCount > 0 || devices.Count != dvs.Count)
+            {
+                this.InvokeOnUiThreadIfRequired(() =>
+                {
+                    dgPhones.DataSource = devices;
+                });
+            }
+
+        }
+
+        public static void StopProcess(string port)
+        {
+            var process = new Process();
+            process.StartInfo.FileName = "cmd.exe";
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardInput = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.CreateNoWindow = true;
+            process.Start();
+            process.StandardInput.WriteLine("netstat -ano");
+            process.StandardInput.WriteLine("exit");
+            Regex regex = new Regex("\\s ", RegexOptions.Compiled);
+            string text;
+            while ((text = process.StandardOutput.ReadLine()) != null)
+            {
+                text = text.Trim();
+                if (text.StartsWith("TCP", StringComparison.OrdinalIgnoreCase))
+                {
+                    text = regex.Replace(text, ",");
+                    string[] array = text.Split(',', StringSplitOptions.None);
+                    int processId;
+                    if (array[2].EndsWith(":" + port) && array.Length >= 13 && int.TryParse(array[13], out processId))
+                    {
+                        KillProcess(processId);
+                    }
+                }
+            }
+        }
+
+        public static void KillProcess(int processId)
+        {
+            try
+            {
+                var process = Process.GetProcessById(processId);
+                if (!process.CloseMainWindow())
+                {
+                    process.Kill();
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        public static void SleepWithDoEvent(int ms)
+        {
+            int millisecondsTimeout = Math.Min(30, ms);
+            DateTime now = DateTime.Now;
+            do
+            {
+                Thread.Sleep(millisecondsTimeout);
+                Application.DoEvents();
+            }
+            while ((DateTime.Now - now).TotalMilliseconds < (double)ms);
+        }
+
+        private void txtWeChatNo_TextChanged(object sender, EventArgs e)
+        {
+            //PersistentParams.TrySaveParam<string>("ForwardMomentsWeChatNo",txtWeChatNo.Text.Trim());
+            appParams.ForwardMomentsWeChatNo = txtWeChatNo.Text.Trim();
+            WriteParams();
+        }
+
+        private void txtMint_TextChanged(object sender, EventArgs e)
+        {
+            //PersistentParams.TrySaveParam<string>("AddFriendWaitMinute", txtWeChatNo.Text.Trim());
+            
+            int.TryParse(txtMint.Text.Trim(),out int mint);
+            appParams.AddFriendWaitMinute = mint;
+            WriteParams();
+        }
+
+        private void txtHour_TextChanged(object sender, EventArgs e)
+        {
+            //PersistentParams.TrySaveParam<string>("ForwardMomentsWaitHour", txtWeChatNo.Text.Trim());
+            int.TryParse(txtHour.Text.Trim(), out int hour);
+            appParams.ForwardMomentsWaitHour = hour;
+            WriteParams();
+        }
+
+        void WriteParams()
+        {
+            var paramFn = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appParams");
+            File.WriteAllText(paramFn,JsonSerializer.Serialize(appParams));
+        }
+    }
+
+    public class Params
+    {
+        public string ForwardMomentsWeChatNo { get; set; }
+        public int AddFriendWaitMinute { get; set; }
+        public int ForwardMomentsWaitHour { get; set; }
     }
 
 }
