@@ -20,11 +20,10 @@ namespace WeChatAddFriend
         public static readonly string ADBPath = "platform-tools\\adb.exe";
         public static int addFriendTotalCount = 0;
         public List<string> importPhoneNos { get; set; }
-
-        DeviceMonitor monitor;
-
         Params appParams;
 
+        CancellationTokenSource addFriendTokenSource = new CancellationTokenSource();
+        CancellationTokenSource forwardMomentsTokenSource = new CancellationTokenSource();
         public WeChatAddFriendForm()
         {
             InitializeComponent();
@@ -35,7 +34,7 @@ namespace WeChatAddFriend
 
         private async void WeChatAddFriendForm_Load(object? sender, EventArgs e)
         {
-            var paramFn = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appParams");            
+            var paramFn = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appParams");
             appParams = File.Exists(paramFn) ? JsonSerializer.Deserialize<Params>(File.ReadAllText(paramFn)) : new Params();
 
             txtWeChatNo.Text = appParams.ForwardMomentsWeChatNo;
@@ -68,7 +67,7 @@ namespace WeChatAddFriend
                         }
                         catch (Exception ex) { }
 
-                        Thread.Sleep(2000);
+                        Thread.Sleep(10000);
                     }
                 });
                 t.IsBackground = true;
@@ -79,26 +78,28 @@ namespace WeChatAddFriend
 
         private async void btnAdd_Click(object sender, EventArgs e)
         {
+            btnStopAddFriend.Visible = true;
+            addFriendTokenSource = new CancellationTokenSource();
             await Task.Run(async () =>
             {
                 addFriendTotalCount = 0;
                 if (adbClient == null) return;
                 var devices = adbClient.GetDevices();
-                if (devices == null) return;
+                if (devices == null || devices.Count < 1) return;
                 devices = devices.Where(k => k.State == DeviceState.Online).ToList();
-                var avgPhoneNoCnt = importPhoneNos.Count() / adbClient.GetDevices().Count();
+                var avgPhoneNoCnt = importPhoneNos.Count() / devices.Count();
 
                 var idx = 0;
                 var tasks = new List<Task>();
                 while (idx < devices.Count)
                 {
-                    var task = AddFriendTask(devices[idx], importPhoneNos.Skip(idx * avgPhoneNoCnt).Take(avgPhoneNoCnt).ToList());
+                    var task = AddFriendTask(devices[idx], importPhoneNos.Skip(idx * avgPhoneNoCnt).Take(avgPhoneNoCnt).ToList(), addFriendTokenSource);
                     tasks.Add(task);
                     idx++;
                 }
 
                 await Task.WhenAll(tasks);
-            });
+            }, addFriendTokenSource.Token);
         }
 
         private async Task StartWeChat(DeviceData d)
@@ -109,126 +110,134 @@ namespace WeChatAddFriend
             await BackWeChatHome(d);
         }
 
-        public async Task AddFriendTask(DeviceData d, List<string> phoneNos)
+        public Task AddFriendTask(DeviceData d, List<string> phoneNos, CancellationTokenSource cancellationTokenSource)
         {
-            await StartWeChat(d);
-
-            var idx = 0;
-            var homeTabBar = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/f2s' and @text='微信']/..", TimeSpan.FromSeconds(2));
-            if (homeTabBar != null)
+            return Task.Run(async () =>
             {
-                homeTabBar.Click();
-                await Task.Delay(1000);
-            }
+                await StartWeChat(d);
 
-            while (idx < phoneNos.Count)
-            {
-                var add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/hy6']", TimeSpan.FromSeconds(2));
-
-                if (add != null)
+                var idx = 0;
+                var homeTabBar = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/f2s' and @text='微信']/..", TimeSpan.FromSeconds(2));
+                if (homeTabBar != null)
                 {
-                    adbClient.Click(d, add.cords);
+                    homeTabBar.Click();
                     await Task.Delay(1000);
                 }
 
-                add = adbClient.FindElement(d, "//node[@text='添加朋友']", TimeSpan.FromSeconds(2));
-                if (add != null)
+                while (idx < phoneNos.Count)
                 {
-                    adbClient.Click(d, add.cords);
-                    await Task.Delay(1000);
-                }
+                    var add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/hy6']", TimeSpan.FromSeconds(2));
 
-                // 点击添加朋友搜索框
-                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/jcd']", TimeSpan.FromSeconds(2));
-                if (add != null)
-                {
-                    adbClient.Click(d, add.cords);
-                    await Task.Delay(2000);
-                }
+                    if (add != null)
+                    {
+                        adbClient.Click(d, add.cords);
+                        await Task.Delay(1000);
+                    }
 
-            ADD_NEXT_PHONE:
-                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/cd7']", TimeSpan.FromSeconds(2));
-                if (add != null)
-                {
-                    adbClient.Click(d, add.cords);
-                    await Task.Delay(1000);
-                    adbClient.ClearInput(d, 15);
-                }
+                    add = adbClient.FindElement(d, "//node[@text='添加朋友']", TimeSpan.FromSeconds(2));
+                    if (add != null)
+                    {
+                        adbClient.Click(d, add.cords);
+                        await Task.Delay(1000);
+                    }
 
-                if (idx >= phoneNos.Count) break;
+                    // 点击添加朋友搜索框
+                    add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/jcd']", TimeSpan.FromSeconds(2));
+                    if (add != null)
+                    {
+                        adbClient.Click(d, add.cords);
+                        await Task.Delay(2000);
+                    }
 
-                //设置文本手机号
-                adbClient.SendText(d, phoneNos[idx]);
-                await Task.Delay(3000);
+                ADD_NEXT_PHONE:
+                    add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/cd7']", TimeSpan.FromSeconds(2));
+                    if (add != null)
+                    {
+                        adbClient.Click(d, add.cords);
+                        await Task.Delay(1000);
+                        adbClient.ClearInput(d, 15);
+                    }
 
-                //点击搜索
-                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/kms']", TimeSpan.FromSeconds(2));
+                    if (idx >= phoneNos.Count) break;
 
-                if (add != null)
-                {
-                    adbClient.Click(d, add.cords);
-                    await Task.Delay(2000);
-                }
+                    //设置文本手机号
+                    adbClient.SendText(d, phoneNos[idx]);
+                    await Task.Delay(3000);
 
-                var userNotExist = adbClient.FindElement(d, "//node[@text='该用户不存在']", TimeSpan.FromSeconds(2));
-                if (userNotExist != null)
-                {
-                    PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} add phone ---{phoneNos[idx]}--跳过用户不存在");
-                    idx++;
-                    goto ADD_NEXT_PHONE;
-                }
+                    //点击搜索
+                    add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/kms']", TimeSpan.FromSeconds(2));
 
-                //已经是好友的 按钮 text 为发消息
-                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/khj' and @text='发消息']", TimeSpan.FromSeconds(2));
-                if (add != null)
-                {
-                    await Task.Delay(2000);
+                    if (add != null)
+                    {
+                        adbClient.Click(d, add.cords);
+                        await Task.Delay(2000);
+                    }
+
+                    var userNotExist = adbClient.FindElement(d, "//node[@text='该用户不存在']", TimeSpan.FromSeconds(2));
+                    if (userNotExist != null)
+                    {
+                        PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} add phone ---{phoneNos[idx]}--跳过用户不存在");
+                        idx++;
+                        goto ADD_NEXT_PHONE;
+                    }
+
+                    //已经是好友的 按钮 text 为发消息
+                    add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/khj' and @text='发消息']", TimeSpan.FromSeconds(2));
+                    if (add != null)
+                    {
+                        await Task.Delay(2000);
+                        adbClient.BackBtn(d);
+                        PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} add phone ---{phoneNos[idx]}--跳过用户已经是好友");
+                        idx++;
+                        goto ADD_NEXT_PHONE;
+
+                    }
+                    //添加好友到通讯录
+                    add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/khj' and @text='添加到通讯录']", TimeSpan.FromSeconds(2));
+                    if (add != null)
+                    {
+                        adbClient.Click(d, add.cords);
+                        await Task.Delay(2000);
+                    }
+
+                    //发送添加好友按钮
+                    add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/e9q']", TimeSpan.FromSeconds(2));
+                    if (add != null)
+                    {
+                        adbClient.Click(d, add.cords);
+                        await Task.Delay(1000);
+                    }
+
+                    //再次点击发送加好友请求
+                    add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/e9q']", TimeSpan.FromSeconds(2));
+                    if (add != null)
+                    {
+                        adbClient.Click(d, add.cords);
+                        await Task.Delay(1000);
+                    }
+
+                    PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} 添加手机号:-{phoneNos[idx]}");
+
+                    //返回
                     adbClient.BackBtn(d);
-                    PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} add phone ---{phoneNos[idx]}--跳过用户已经是好友");
+
+                    int.TryParse(txtMint.Text.Trim(), out var min);
+                    //await Task.Delay(min * 60 * 1000);
+
+                    if (addFriendTokenSource.Token.IsCancellationRequested)
+                    {
+                        addFriendTokenSource.Token.ThrowIfCancellationRequested();
+                    }
+
+                    SleepWithDoEvent(min * 60 * 1000);
+
+                    adbClient.BackBtn(d);
+
+                    addFriendTotalCount++;
+
                     idx++;
-                    goto ADD_NEXT_PHONE;
-
                 }
-                //添加好友到通讯录
-                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/khj' and @text='添加到通讯录']", TimeSpan.FromSeconds(2));
-                if (add != null)
-                {
-                    adbClient.Click(d, add.cords);
-                    await Task.Delay(2000);
-                }
-
-                //发送添加好友按钮
-                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/e9q']", TimeSpan.FromSeconds(2));
-                if (add != null)
-                {
-                    adbClient.Click(d, add.cords);
-                    await Task.Delay(1000);
-                }
-
-                //再次点击发送加好友请求
-                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/e9q']", TimeSpan.FromSeconds(2));
-                if (add != null)
-                {
-                    adbClient.Click(d, add.cords);
-                    await Task.Delay(1000);
-                }
-
-                PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} 添加手机号:-{phoneNos[idx]}");
-
-                //返回
-                adbClient.BackBtn(d);
-
-                int.TryParse(txtMint.Text.Trim(), out var min);
-                //await Task.Delay(min * 60 * 1000);
-
-                SleepWithDoEvent(min * 60 * 1000);
-
-                adbClient.BackBtn(d);
-
-                addFriendTotalCount++;
-
-                idx++;
-            }
+            }, addFriendTokenSource.Token);
         }
 
         private void btnImportData_Click(object sender, EventArgs e)
@@ -260,11 +269,14 @@ namespace WeChatAddFriend
         {
             while (true)
             {
+                var radarAddFriend = adbClient.FindElement(d, "//node[@resource-id='android:id/title' and @text='雷达加朋友']", TimeSpan.FromSeconds(2));
+
                 var disCover = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/f2s' and @text='发现']", TimeSpan.FromSeconds(2));
-                if (disCover != null)
+                if (disCover != null && radarAddFriend == null)
                 {
                     break;
                 }
+
                 adbClient.BackBtn(d);
                 await Task.Delay(1000);
             }
@@ -276,6 +288,8 @@ namespace WeChatAddFriend
         /// <returns></returns>
         private async void btnForwardMoments_Click(object sender, EventArgs e)
         {
+            btnStopForwardMoments.Visible = true;
+            forwardMomentsTokenSource = new CancellationTokenSource();
             await Task.Run(async () =>
             {
                 if (adbClient == null) return;
@@ -291,7 +305,7 @@ namespace WeChatAddFriend
                 }
 
                 await Task.WhenAll(tasks);
-            });
+            }, forwardMomentsTokenSource.Token);
         }
 
         /// <summary>
@@ -300,282 +314,291 @@ namespace WeChatAddFriend
         /// <param name="d"></param>
         /// <param name="wxNo"></param>
         /// <returns></returns>
-        private async Task ForwardMoments(DeviceData d, string wxNo)
+        private Task ForwardMoments(DeviceData d, string wxNo)
         {
-            await StartWeChat(d);
-
-            var savePicCount = 0;
-            var hasVideo = false;
-            await BackWeChatHome(d);
-
-            var friendsTabBar = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/f2s' and @text='通讯录']/..", TimeSpan.FromSeconds(2));
-            if (friendsTabBar != null)
+            return Task.Run(async () =>
             {
-                friendsTabBar.Click();
-                await Task.Delay(1000);
-            }
+                await StartWeChat(d);
+                var savePicCount = 0;
+                var hasVideo = false;
+                await BackWeChatHome(d);
 
-            var searchFriendBtn = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/gsl']", TimeSpan.FromSeconds(2));
-            if (searchFriendBtn != null)
-            {
-                searchFriendBtn.Click();
-                await Task.Delay(1000);
-            }
-
-            var searchEdt = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/cd7' and @text='搜索']/..", TimeSpan.FromSeconds(2));
-            if (searchEdt != null)
-            {
-                searchEdt.Click();
-                await Task.Delay(1000);
-                adbClient.ClearInput(d, 15);
-            }
-
-            //wangyaqing1991    
-
-            //设置搜索要复制转发的好友
-            adbClient.SendText(d, wxNo);
-            await Task.Delay(3000);
-
-            var searchFriendResultTextView = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/kpm']", TimeSpan.FromSeconds(2));
-            if (searchFriendResultTextView != null)
-            {
-                searchFriendResultTextView.Click();
-                await Task.Delay(1000);
-            }
-
-            //右上角的三个点，进入聊天记录界面
-            var add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/eo']", TimeSpan.FromSeconds(2));
-            if (add != null)
-            {
-                adbClient.Click(d, add.cords);
-                await Task.Delay(1000);
-            }
-
-            //点击好友头像
-            add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/iw8']", TimeSpan.FromSeconds(2));
-            if (add != null)
-            {
-                adbClient.Click(d, add.cords);
-                await Task.Delay(1000);
-            }
-
-            //点击朋友圈
-            add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/o8' and @text='朋友圈']", TimeSpan.FromSeconds(2));
-            if (add != null)
-            {
-                adbClient.Click(d, add.cords);
-                await Task.Delay(1000);
-            }
-
-            //点击进入朋友圈详情
-            add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/br8']", TimeSpan.FromSeconds(2));
-            if (add != null)
-            {
-                adbClient.Click(d, add.cords);
-                await Task.Delay(1000);
-            }
-
-            //长按朋友圈文字，准备复制
-            add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/c2h']", TimeSpan.FromSeconds(2));
-            if (add != null)
-            {
-                adbClient.Swipe(d, add, add, 2000);
-                await Task.Delay(1000);
-            }
-
-            //复制朋友圈内容
-            add = adbClient.FindElement(d, "//node[@text='复制']", TimeSpan.FromSeconds(2));
-            if (add != null)
-            {
-                adbClient.Click(d, add.cords);
-                await Task.Delay(1000);
-            }
-
-            //保存朋友圈图片
-            var pics = adbClient.FindElements(d, "//node[@content-desc='图片']", TimeSpan.FromSeconds(2));
-            if (pics != null && pics.Count() > 0)
-            {
-                savePicCount = pics.Count();
-                var idx = 0;
-                while (idx < pics.Count())
+                var friendsTabBar = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/f2s' and @text='通讯录']/..", TimeSpan.FromSeconds(2));
+                if (friendsTabBar != null)
                 {
-                    var p = pics[idx];
-                    if (idx == 0)
+                    friendsTabBar.Click();
+                    await Task.Delay(1000);
+                }
+
+                var searchFriendBtn = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/gsl']", TimeSpan.FromSeconds(2));
+                if (searchFriendBtn != null)
+                {
+                    searchFriendBtn.Click();
+                    await Task.Delay(1000);
+                }
+
+                var searchEdt = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/cd7' and @text='搜索']/..", TimeSpan.FromSeconds(2));
+                if (searchEdt != null)
+                {
+                    searchEdt.Click();
+                    await Task.Delay(1000);
+                    adbClient.ClearInput(d, 15);
+                }
+
+                if (forwardMomentsTokenSource.Token.IsCancellationRequested)
+                {
+                    forwardMomentsTokenSource.Token.ThrowIfCancellationRequested();
+                }
+                //wangyaqing1991    
+
+                //设置搜索要复制转发的好友
+                adbClient.SendText(d, wxNo);
+                await Task.Delay(3000);
+
+                var searchFriendResultTextView = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/kpm']", TimeSpan.FromSeconds(2));
+                if (searchFriendResultTextView != null)
+                {
+                    searchFriendResultTextView.Click();
+                    await Task.Delay(1000);
+                }
+
+                //右上角的三个点，进入聊天记录界面
+                var add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/eo']", TimeSpan.FromSeconds(2));
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
+                }
+
+                //点击好友头像
+                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/iw8']", TimeSpan.FromSeconds(2));
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
+                }
+
+                //点击朋友圈
+                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/o8' and @text='朋友圈']", TimeSpan.FromSeconds(2));
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
+                }
+
+                //点击进入朋友圈详情
+                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/br8']", TimeSpan.FromSeconds(2));
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
+                }
+
+                //长按朋友圈文字，准备复制
+                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/c2h']", TimeSpan.FromSeconds(2));
+                if (add != null)
+                {
+                    adbClient.Swipe(d, add, add, 2000);
+                    await Task.Delay(1000);
+                }
+
+                //复制朋友圈内容
+                add = adbClient.FindElement(d, "//node[@text='复制']", TimeSpan.FromSeconds(2));
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
+                }
+                if (forwardMomentsTokenSource.Token.IsCancellationRequested)
+                {
+                    forwardMomentsTokenSource.Token.ThrowIfCancellationRequested();
+                }
+                //保存朋友圈图片
+                var pics = adbClient.FindElements(d, "//node[@content-desc='图片']", TimeSpan.FromSeconds(2));
+                if (pics != null && pics.Count() > 0)
+                {
+                    savePicCount = pics.Count();
+                    var idx = 0;
+                    while (idx < pics.Count())
                     {
-                        adbClient.Click(d, p.cords);
+                        var p = pics[idx];
+                        if (idx == 0)
+                        {
+                            adbClient.Click(d, p.cords);
+                            await Task.Delay(1000);
+                        }
+
+                        //长按图片弹出  保存按钮
+                        adbClient.Swipe(d, p, p, 2000);
+                        await Task.Delay(1000);
+
+                        //点击保存图片
+                        var savePicBtn = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/knx' and @text='保存图片']", TimeSpan.FromSeconds(2));
+                        if (savePicBtn != null)
+                        {
+                            adbClient.Click(d, savePicBtn.cords);
+                            await Task.Delay(2000);
+                        }
+
+                        //左滑
+                        adbClient.Swipe(d, p.cords.x, p.cords.y, 0, p.cords.y, 150);
+                        await Task.Delay(2000);
+
+                        idx++;
+                    }
+                }
+
+                var video = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/b47' and @content-desc='视频']", TimeSpan.FromSeconds(2));
+                if (video != null)
+                {
+                    hasVideo = true;
+                    adbClient.Click(d, video.cords);
+                    await Task.Delay(5000);
+
+                    //长按图片弹出  保存按钮
+                    adbClient.Swipe(d, video, video, 2000);
+                    await Task.Delay(2000);
+
+                    //点击保存视频
+                    var saveVideoBtn = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/knx' and @text='保存视频']", TimeSpan.FromSeconds(2));
+                    if (saveVideoBtn != null)
+                    {
+                        adbClient.Click(d, saveVideoBtn.cords);
+                        await Task.Delay(5000);
+                    }
+                }
+
+                await BackWeChatHome(d);
+
+                //开始发朋友圈
+                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/f2s' and @text='发现']/..", TimeSpan.FromSeconds(2));
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
+                }
+
+                add = adbClient.FindElement(d, "//node[@resource-id='android:id/title' and @text='朋友圈']", TimeSpan.FromSeconds(2));
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
+                }
+
+                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/eo' and @content-desc='拍照分享']", TimeSpan.FromSeconds(2));
+
+                if (savePicCount > 0)
+                {
+                    if (add != null)
+                    {
+                        adbClient.Click(d, add.cords);
                         await Task.Delay(1000);
                     }
 
-                    //长按图片弹出  保存按钮
-                    adbClient.Swipe(d, p, p, 2000);
-                    await Task.Delay(1000);
-
-                    //点击保存图片
-                    var savePicBtn = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/knx' and @text='保存图片']", TimeSpan.FromSeconds(2));
-                    if (savePicBtn != null)
+                    add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/knx' and @text='从相册选择']", TimeSpan.FromSeconds(2));
+                    if (add != null)
                     {
-                        adbClient.Click(d, savePicBtn.cords);
-                        await Task.Delay(2000);
+                        adbClient.Click(d, add.cords);
+                        await Task.Delay(1000);
                     }
 
-                    //左滑
-                    adbClient.Swipe(d, p.cords.x, p.cords.y, 0, p.cords.y, 150);
-                    await Task.Delay(2000);
+                    //获取相册里的图片
+                    var picChks = adbClient.FindElements(d, "//node[@resource-id='com.tencent.mm:id/gpy']", TimeSpan.FromSeconds(2));
+                    var idx = 0;
+                    while (idx < savePicCount)
+                    {
+                        var chk = picChks[idx];
+                        adbClient.Click(d, chk.startCords);
+                        await Task.Delay(300);
+                        idx++;
+                    }
 
-                    idx++;
+                    add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/en' and @text='完成']", TimeSpan.FromSeconds(2));
+                    if (add != null)
+                    {
+                        adbClient.Click(d, add.cords);
+                        await Task.Delay(1000);
+                    }
+
+                    //完成图片选择
+                    add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/en']", TimeSpan.FromSeconds(2));
+                    if (add != null)
+                    {
+                        adbClient.Click(d, add.cords);
+                        await Task.Delay(1000);
+                    }
                 }
-            }
-
-            var video = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/b47' and @content-desc='视频']", TimeSpan.FromSeconds(2));
-            if (video != null)
-            {
-                hasVideo = true;
-                adbClient.Click(d, video.cords);
-                await Task.Delay(5000);
-
-                //长按图片弹出  保存按钮
-                adbClient.Swipe(d, video, video, 2000);
-                await Task.Delay(2000);
-
-                //点击保存视频
-                var saveVideoBtn = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/knx' and @text='保存视频']", TimeSpan.FromSeconds(2));
-                if (saveVideoBtn != null)
+                else if (hasVideo)
                 {
-                    adbClient.Click(d, saveVideoBtn.cords);
-                    await Task.Delay(5000);
-                }
-            }
+                    if (add != null)
+                    {
+                        adbClient.Click(d, add.cords);
+                        await Task.Delay(1000);
+                    }
 
-            await BackWeChatHome(d);
+                    add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/knx' and @text='从相册选择']", TimeSpan.FromSeconds(2));
+                    if (add != null)
+                    {
+                        adbClient.Click(d, add.cords);
+                        await Task.Delay(1000);
+                    }
 
-            //开始发朋友圈
-            add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/f2s' and @text='发现']/..", TimeSpan.FromSeconds(2));
-            if (add != null)
-            {
-                adbClient.Click(d, add.cords);
-                await Task.Delay(1000);
-            }
-
-            add = adbClient.FindElement(d, "//node[@resource-id='android:id/title' and @text='朋友圈']", TimeSpan.FromSeconds(2));
-            if (add != null)
-            {
-                adbClient.Click(d, add.cords);
-                await Task.Delay(1000);
-            }
-
-            add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/eo' and @content-desc='拍照分享']", TimeSpan.FromSeconds(2));
-
-            if (savePicCount > 0)
-            {
-                if (add != null)
-                {
-                    adbClient.Click(d, add.cords);
-                    await Task.Delay(1000);
-                }
-
-                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/knx' and @text='从相册选择']", TimeSpan.FromSeconds(2));
-                if (add != null)
-                {
-                    adbClient.Click(d, add.cords);
-                    await Task.Delay(1000);
-                }
-
-                //获取相册里的图片
-                var picChks = adbClient.FindElements(d, "//node[@resource-id='com.tencent.mm:id/gpy']", TimeSpan.FromSeconds(2));
-                var idx = 0;
-                while (idx < savePicCount)
-                {
-                    var chk = picChks[idx];
+                    //获取相册里的图片 CheckBox
+                    var videoChks = adbClient.FindElements(d, "//node[@resource-id='com.tencent.mm:id/gpy']", TimeSpan.FromSeconds(2));
+                    var chk = videoChks[0];
                     adbClient.Click(d, chk.startCords);
                     await Task.Delay(300);
-                    idx++;
+
+                    add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/en' and @text='完成']", TimeSpan.FromSeconds(2));
+                    if (add != null)
+                    {
+                        adbClient.Click(d, add.cords);
+                        await Task.Delay(1000);
+                    }
+
+                    //视频第二次点完成
+                    add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/cco' and @text='完成']", TimeSpan.FromSeconds(2));
+                    if (add != null)
+                    {
+                        adbClient.Click(d, add.cords);
+                        await Task.Delay(1000);
+                    }
+                }
+                else
+                {
+                    //长按拍照分享按钮,发纯文字朋友圈
+                    adbClient.Swipe(d, add, add, 2000);
+                    await Task.Delay(1000);
                 }
 
-                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/en' and @text='完成']", TimeSpan.FromSeconds(2));
+                //粘贴文字
+                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/jsy']", TimeSpan.FromSeconds(2));
+                if (add != null)
+                {
+                    adbClient.Click(d, add.cords);
+                    await Task.Delay(1000);
+                    //KEYCODE_PASTE
+                    adbClient.SendKeyEvent(d, "279");
+                    await Task.Delay(1000);
+
+                    //退掉键盘
+                    adbClient.BackBtn(d);
+                }
+
+                //发圈
+                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/en' and @text='发表']", TimeSpan.FromSeconds(2));
                 if (add != null)
                 {
                     adbClient.Click(d, add.cords);
                     await Task.Delay(1000);
                 }
 
-                //完成图片选择
-                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/en']", TimeSpan.FromSeconds(2));
-                if (add != null)
-                {
-                    adbClient.Click(d, add.cords);
-                    await Task.Delay(1000);
-                }
-            }
-            else if (hasVideo)
-            {
-                if (add != null)
-                {
-                    adbClient.Click(d, add.cords);
-                    await Task.Delay(1000);
-                }
 
-                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/knx' and @text='从相册选择']", TimeSpan.FromSeconds(2));
-                if (add != null)
-                {
-                    adbClient.Click(d, add.cords);
-                    await Task.Delay(1000);
-                }
+                int.TryParse(txtHour.Text.Trim(), out var hour);
+                //await Task.Delay(hour * 60  * 60 * 1000);
 
-                //获取相册里的图片 CheckBox
-                var videoChks = adbClient.FindElements(d, "//node[@resource-id='com.tencent.mm:id/gpy']", TimeSpan.FromSeconds(2));
-                var chk = videoChks[0];
-                adbClient.Click(d, chk.startCords);
-                await Task.Delay(300);
-
-                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/en' and @text='完成']", TimeSpan.FromSeconds(2));
-                if (add != null)
-                {
-                    adbClient.Click(d, add.cords);
-                    await Task.Delay(1000);
-                }
-
-                //视频第二次点完成
-                add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/cco' and @text='完成']", TimeSpan.FromSeconds(2));
-                if (add != null)
-                {
-                    adbClient.Click(d, add.cords);
-                    await Task.Delay(1000);
-                }
-            }
-            else
-            {
-                //长按拍照分享按钮,发纯文字朋友圈
-                adbClient.Swipe(d, add, add, 2000);
-                await Task.Delay(1000);
-            }
-
-            //粘贴文字
-            add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/jsy']", TimeSpan.FromSeconds(2));
-            if (add != null)
-            {
-                adbClient.Click(d, add.cords);
-                await Task.Delay(1000);
-                //KEYCODE_PASTE
-                adbClient.SendKeyEvent(d, "279");
-                await Task.Delay(1000);
-
-                //退掉键盘
-                adbClient.BackBtn(d);
-            }
-
-            //发圈
-            add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/en' and @text='发表']", TimeSpan.FromSeconds(2));
-            if (add != null)
-            {
-                adbClient.Click(d, add.cords);
-                await Task.Delay(1000);
-            }
-
-
-            int.TryParse(txtHour.Text.Trim(), out var hour);
-            //await Task.Delay(hour * 60  * 60 * 1000);
-
-            SleepWithDoEvent(hour * 60 * 60 * 1000);
+                SleepWithDoEvent(hour * 60 * 60 * 1000);
+            }, forwardMomentsTokenSource.Token);
         }
 
         private async void btnSaveMoments_Click(object sender, EventArgs e)
@@ -831,32 +854,32 @@ namespace WeChatAddFriend
 
         private async void UpdateDevices(List<DeviceData> devices)
         {
-            var idx = 0;
-            while (idx < devices.Count)
-            {
-                var device = devices[idx++];
-                var ip = string.Empty;
-                if (!device.Serial.EndsWith(":5555") && device.State == DeviceState.Online)
-                {
-                    ip = adbClient.GetDeviceIp(device);
-                    if (!devices.Any(d => d.Serial.StartsWith(ip)))
-                    {
-                        device.Name = ip;
-                        await Task.Run(() =>
-                        {
-                            if (!string.IsNullOrEmpty(ip) && !devices.Any(d => d.Serial.StartsWith(ip)))
-                            {
-                                adbClient.StartTcpIp(device);
-                                adbClient.Connect(ip);
-                            }
-                        });
-                    }
-                    if (!string.IsNullOrEmpty(ip))
-                    {
-                        device.Name = ip;
-                    }
-                }
-            }
+            //var idx = 0;
+            //while (idx < devices.Count)
+            //{
+            //    var device = devices[idx++];
+            //    var ip = string.Empty;
+            //    if (!device.Serial.EndsWith(":5555") && device.State == DeviceState.Online)
+            //    {
+            //        ip = adbClient.GetDeviceIp(device);
+            //        if (!devices.Any(d => d.Serial.StartsWith(ip)))
+            //        {
+            //            device.Name = ip;
+            //            await Task.Run(() =>
+            //            {
+            //                if (!string.IsNullOrEmpty(ip) && !devices.Any(d => d.Serial.StartsWith(ip)))
+            //                {
+            //                    adbClient.StartTcpIp(device);
+            //                    adbClient.Connect(ip);
+            //                }
+            //            });
+            //        }
+            //        if (!string.IsNullOrEmpty(ip))
+            //        {
+            //            device.Name = ip;
+            //        }
+            //    }
+            //}
 
             var dvs = dgPhones.DataSource as List<DeviceData>;
             dvs = dvs ?? new List<DeviceData>();
@@ -939,8 +962,8 @@ namespace WeChatAddFriend
         private void txtMint_TextChanged(object sender, EventArgs e)
         {
             //PersistentParams.TrySaveParam<string>("AddFriendWaitMinute", txtWeChatNo.Text.Trim());
-            
-            int.TryParse(txtMint.Text.Trim(),out int mint);
+
+            int.TryParse(txtMint.Text.Trim(), out int mint);
             appParams.AddFriendWaitMinute = mint;
             WriteParams();
         }
@@ -956,7 +979,29 @@ namespace WeChatAddFriend
         void WriteParams()
         {
             var paramFn = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appParams");
-            File.WriteAllText(paramFn,JsonSerializer.Serialize(appParams));
+            File.WriteAllText(paramFn, JsonSerializer.Serialize(appParams));
+        }
+
+        private void btnStopForwardMoments_VisibleChanged(object sender, EventArgs e)
+        {
+            btnForwardMoments.Visible = !btnStopForwardMoments.Visible;
+        }
+
+        private void btnStopAddFriend_VisibleChanged(object sender, EventArgs e)
+        {
+            btnAdd.Visible = !btnStopAddFriend.Visible;
+        }
+
+        private void btnStopForwardMoments_Click(object sender, EventArgs e)
+        {
+            btnStopForwardMoments.Visible = false;
+            forwardMomentsTokenSource.Cancel();
+        }
+
+        private void btnStopAddFriend_Click(object sender, EventArgs e)
+        {
+            btnStopAddFriend.Visible = false;
+            addFriendTokenSource.Cancel();
         }
     }
 

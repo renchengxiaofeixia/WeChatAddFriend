@@ -50,6 +50,8 @@
             label5 = new Label();
             label6 = new Label();
             lblDeviceNum = new Label();
+            btnStopForwardMoments = new Button();
+            btnStopAddFriend = new Button();
             ((System.ComponentModel.ISupportInitialize)dgPhones).BeginInit();
             ctxMenu.SuspendLayout();
             SuspendLayout();
@@ -104,7 +106,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(584, 11);
+            label1.Location = new Point(576, 11);
             label1.Name = "label1";
             label1.Size = new Size(37, 15);
             label1.TabIndex = 2;
@@ -113,9 +115,9 @@
             // txtLog
             // 
             txtLog.BorderStyle = BorderStyle.FixedSingle;
-            txtLog.Location = new Point(584, 29);
+            txtLog.Location = new Point(576, 29);
             txtLog.Name = "txtLog";
-            txtLog.Size = new Size(484, 361);
+            txtLog.Size = new Size(302, 361);
             txtLog.TabIndex = 1;
             txtLog.Text = "";
             txtLog.TextChanged += txtLog_TextChanged;
@@ -234,18 +236,45 @@
             lblDeviceNum.Size = new Size(0, 15);
             lblDeviceNum.TabIndex = 3;
             // 
+            // btnStopForwardMoments
+            // 
+            btnStopForwardMoments.Location = new Point(436, 40);
+            btnStopForwardMoments.Name = "btnStopForwardMoments";
+            btnStopForwardMoments.Size = new Size(102, 28);
+            btnStopForwardMoments.TabIndex = 17;
+            btnStopForwardMoments.Text = "停止发圈";
+            btnStopForwardMoments.UseVisualStyleBackColor = true;
+            btnStopForwardMoments.Visible = false;
+            btnStopForwardMoments.VisibleChanged += btnStopForwardMoments_VisibleChanged;
+            btnStopForwardMoments.Click += btnStopForwardMoments_Click;
+            // 
+            // btnStopAddFriend
+            // 
+            btnStopAddFriend.Location = new Point(12, 10);
+            btnStopAddFriend.Name = "btnStopAddFriend";
+            btnStopAddFriend.Size = new Size(100, 31);
+            btnStopAddFriend.TabIndex = 18;
+            btnStopAddFriend.Text = "停止加好友";
+            btnStopAddFriend.UseVisualStyleBackColor = true;
+            btnStopAddFriend.Visible = false;
+            btnStopAddFriend.VisibleChanged += btnStopAddFriend_VisibleChanged;
+            btnStopAddFriend.Click += btnStopAddFriend_Click;
+            // 
             // WeChatAddFriendForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1073, 412);
+            ClientSize = new Size(890, 412);
+            Controls.Add(btnAdd);
+            Controls.Add(btnStopAddFriend);
+            Controls.Add(btnForwardMoments);
+            Controls.Add(btnStopForwardMoments);
             Controls.Add(txtHour);
             Controls.Add(label5);
             Controls.Add(label6);
             Controls.Add(dgPhones);
             Controls.Add(label4);
             Controls.Add(txtWeChatNo);
-            Controls.Add(btnForwardMoments);
             Controls.Add(txtMint);
             Controls.Add(label3);
             Controls.Add(label2);
@@ -253,7 +282,6 @@
             Controls.Add(lblDeviceNum);
             Controls.Add(label1);
             Controls.Add(txtLog);
-            Controls.Add(btnAdd);
             DoubleBuffered = true;
             MaximizeBox = false;
             MinimizeBox = false;
@@ -290,5 +318,7 @@
         private Label label5;
         private Label label6;
         private Label lblDeviceNum;
+        private Button btnStopForwardMoments;
+        private Button btnStopAddFriend;
     }
 }

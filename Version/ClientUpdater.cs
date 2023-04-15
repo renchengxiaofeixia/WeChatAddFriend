@@ -8,6 +8,12 @@ using System.IO;
 using System.Net;
 using System.Windows;
 using WeChatAddFriend.Extensions;
+using WeChatAddFriend.Net;
+using System.Text.Json;
+using System.Net.Http.Headers;
+using System.Reflection.Metadata;
+using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
 namespace WeChatAddFriend.Version
 {
@@ -16,19 +22,73 @@ namespace WeChatAddFriend.Version
 		private static bool _isUpdating;
 		private static string _patchFn;
 		private static string _baseFn;
-		static ClientUpdater()
+        private static WindowsFormsSynchronizationContext windowsFormsSynchronizationContext;
+        static ClientUpdater()
 		{
-			_patchFn = PathEx.ParentOfExePath + "patch";
-			_baseFn = PathEx.ParentOfExePath + "base";
-		}
+			_patchFn = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"patch");
+			_baseFn = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "base");
+            windowsFormsSynchronizationContext = new WindowsFormsSynchronizationContext();
+        }
 
-        public static void UpdateForTip(appversion appver)
+        public async static void Update() 
+        {
+            var loginInfo = await Login();
+            if (loginInfo.UpdateEntity != null)
+            {
+                UpdateForTip(loginInfo.UpdateEntity);
+            }
+        }
+
+        public async static Task<LoginDownloadEntity> Login()
+        {
+            var firstLoginMainNicks = new List<string> { "WeChatAddFriend" };
+            var newAppver = InstalledVersionManager.GetNewestVersion();
+            var url = "http://112.74.19.214:30010/api/bot/login";
+            try
+            {
+                LoginDownloadEntity loginInfo = null;
+                var client = new HttpClient();
+                var parameters = new Dictionary<string, string>() {
+                        {"nicks",string.Join(",",firstLoginMainNicks)},
+                        {"firstLoginMainNicks",string.Join(",",firstLoginMainNicks)},
+                        {"appver",newAppver==null ? "0" : newAppver.Version.ToString()},
+                        {"instanceGuid",Guid.NewGuid().ToString() } };
+                var res = client.PostAsync(url, new FormUrlEncodedContent(parameters)).Result;
+                ApiResponse responseLogin = null;
+                var json = await res.Content.ReadAsStringAsync();
+                if (!string.IsNullOrEmpty(json))
+                {
+                    responseLogin = JsonSerializer.Deserialize<ApiResponse>(json);
+                    if (responseLogin != null && responseLogin.Code == 200 && !string.IsNullOrEmpty(responseLogin.Data))
+                    {
+                        loginInfo = JsonSerializer.Deserialize<LoginDownloadEntity>(responseLogin.Data);
+                    }
+                    else
+                    {
+                        Log.Error("请求接口出错:" + responseLogin.Message);
+                    }
+                }
+
+                if (loginInfo != null && loginInfo.UpdateEntity != null)
+                {
+                    loginInfo.UpdateEntity.PatchUrl = "http://112.74.19.214:30010/api/bot/downloadpatchfile?fn=" + loginInfo.UpdateEntity.PatchFileName;
+                }
+                return loginInfo;
+            }
+            catch (Exception ex)
+            {
+                Log.Exception(ex);
+                return null;
+            }
+        }
+
+        public static void UpdateForTip(UpdateDownloadEntity appver)
 		{
 			if (!appver.IsForceUpdate)
 			{
 				var ver = ShareUtil.ConvertVersionToString(appver.PatchVersion);
 				var msg = string.Format("发现新版【{0}】，解决问题：\r\n\r\n{1}\r\n\r\n是否升级?", ver, appver.Tip);
-				if(MessageBox.Show(msg, "升级提示",MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+				if(MessageBox.Show(msg, "升级提示",MessageBoxButtons.YesNo)  == DialogResult.Yes)
                 {
                     UpdateAsync(appver);
                 }
@@ -44,9 +104,9 @@ namespace WeChatAddFriend.Version
             Task.Factory.StartNew(ManualUpdate, TaskCreationOptions.LongRunning);
         }
 
-        private static void UpdateAsync(appversion appver)
+        private static void UpdateAsync(UpdateDownloadEntity updt)
 		{
-			Task.Factory.StartNew(()=>Update(appver), TaskCreationOptions.LongRunning);
+			Task.Factory.StartNew(()=>Update(updt), TaskCreationOptions.LongRunning);
 		}
 
 		private async static void ManualUpdate()
@@ -54,7 +114,7 @@ namespace WeChatAddFriend.Version
             try
             {
                 var curappver = InstalledVersionManager.GetNewestVersion();
-                var newappver = await SycmApi.GetNewVer(curappver.Version.ToString());
+                var newappver = await GetNewestVer(curappver.Version.ToString());
                 if (newappver == null)
                 {
                     throw new Exception("无法从服务器获取新版信息");
@@ -72,15 +132,15 @@ namespace WeChatAddFriend.Version
             }
         }
 
-        private static void Update(appversion appver)
+        private static void Update(UpdateDownloadEntity appver)
 		{
 			if (!_isUpdating)
 			{
 				_isUpdating = true;
 				try
 				{
-					Log.Info(string.Format("开始升级，补丁={0}", Util.SerializeWithTypeName(appver)));
-					var newVerDir = PathEx.ParentOfExePath + ShareUtil.ConvertVersionToString(appver.PatchVersion);
+					Log.Info(string.Format("开始升级，补丁={0}", JsonSerializer.Serialize(appver)));
+					var newVerDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ShareUtil.ConvertVersionToString(appver.PatchVersion));
 					NetUtil.DownFile(appver.PatchUrl, _patchFn, appver.PatchSize);
                     DirectoryEx.DeleteC(newVerDir, true);
 					CopyBaseFile(newVerDir);
@@ -96,7 +156,7 @@ namespace WeChatAddFriend.Version
 					else
 					{
                         var msg = string.Format("{0}已升级到版本{1},是否立即重启软件，使用新版本？", "软件", ShareUtil.ConvertVersionToString(appver.PatchVersion));
-                        if (MessageBox.Show(msg, "提示",MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        if (MessageBox.Show(msg, "提示",MessageBoxButtons.YesNo) == DialogResult.Yes)
 						{
 							Reboot();
 						}
@@ -105,24 +165,55 @@ namespace WeChatAddFriend.Version
 				catch (Exception ex)
 				{
 					Log.Exception(ex);
-                    DispatcherEx.xInvoke(() => MessageBox.Show(string.Format("升级失败，原因={0}", ex.Message)));
+                    windowsFormsSynchronizationContext.Send(k => MessageBox.Show(string.Format("升级失败，原因={0}", ex.Message)),null);
 				}
 				Log.Info("结束升级补丁");
 				_isUpdating = false;
 			}
 		}
 
+        public static async Task<UpdateDownloadEntity> GetNewestVer(string appver)
+        {
+            try
+            {
+                var url = "http://112.74.19.214:30010/api/bot/getnewver";
+                UpdateDownloadEntity newver = null;
+                var client = new HttpClient();
+                var content = new MultipartFormDataContent();
+                content.Add(new StringContent("appver"), appver);
+                var res = client.PostAsync(url, content).Result;
+                ApiResponse responseVersion = null;
+                var json = await res.Content.ReadAsStringAsync();
+                if (!string.IsNullOrEmpty(json))
+                {
+                    responseVersion = JsonSerializer.Deserialize<ApiResponse>(json);
+                    if (responseVersion != null && responseVersion.Code == 200 && !string.IsNullOrEmpty(responseVersion.Data))
+                    {
+                        newver = JsonSerializer.Deserialize<UpdateDownloadEntity>(responseVersion.Data);
+                    }
+                    else
+                    {
+                        Log.Error("请求接口出错:" + responseVersion.Message);
+                    }
+                }
+
+                return newver;
+            }
+            catch (Exception ex)
+            {
+                Log.Exception(ex);
+                return null;
+            }
+        }
+
         public static void Reboot()
         {
 	        var fn = PathEx.ParentOfExePath + "Booter.exe";
 	        Process.Start(fn, "reboot");
-	        DispatcherEx.xInvoke(()=>
-	        {
-		        if (Application.Current != null)
-		        {
-			        Application.Current.Shutdown();
-		        }
-	        });
+            windowsFormsSynchronizationContext.Send(k =>
+            {
+                Application.Exit();
+	        },null);
         }
 
         private static void CopyBaseFile(string destDir)
@@ -151,5 +242,32 @@ namespace WeChatAddFriend.Version
 			}
 			return path;
 		}
+    }
+
+    public class ApiResponse
+    {
+        public int Code { get; set; }
+        public string Message { get; set; }
+        public string Data { get; set; }
+    }
+
+
+    public class LoginDownloadEntity
+    {
+        public List<string> NickDatas;
+        public List<string> ShopDatas;
+        public string ClientBanReason;
+        public string Tip;
+        public UpdateDownloadEntity UpdateEntity;
+    }
+
+    public class UpdateDownloadEntity
+    {
+        public bool IsForceUpdate { get; set; }
+        public int PatchVersion { get; set; }
+        public string PatchUrl { get; set; }
+        public string PatchFileName { get; set; }
+        public int PatchSize { get; set; }
+        public string Tip { get; set; }
     }
 }

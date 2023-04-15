@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "Pz2ExUueh9v8S6XtiN0pAo1EYAK417dE48QLQTYaXN0TycUldPZgRW4AT1XwFmRa/YTz9/Qiigg4w9QlnLopSQ==",
+  "dgSpecHash": "4bWE9FQiolA/6VzGTaUmEYYG5NhWxTX7ymCsl5ClWd+OjvbI0BafdvdN02TkasJA05ks19x8OgL8uY1TRbqr7g==",
   "success": true,
   "projectFilePath": "D:\\src\\WeChatAddFriend\\WeChatAddFriend.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\Administrator\\.nuget\\packages\\sharpziplib\\1.4.2\\sharpziplib.1.4.2.nupkg.sha512"
+  ],
   "logs": []
 }

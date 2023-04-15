@@ -1,5 +1,4 @@
-﻿using WeChatAddFriend.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -14,14 +13,10 @@ namespace WeChatAddFriend.Version
 
         public static string GetExeFileName()
         {
-            var fn = InstalledVersionManager.GetExeFileNameFromConfigFile();
+            var fn = GetExeFileNameFromConfigFile();
             if (string.IsNullOrEmpty(fn))
             {
-                fn = InstalledVersionManager.GetReleaseVersionExeFileNameForTest();
-            }
-            if (string.IsNullOrEmpty(fn))
-            {
-                fn = InstalledVersionManager.GetMaxVersionExeFileName();
+                fn = GetMaxVersionExeFileName();
             }
             return fn;
         }
@@ -29,7 +24,7 @@ namespace WeChatAddFriend.Version
         private static string GetMaxVersionExeFileName()
         {
             var fn = string.Empty;
-            var newestVersion = InstalledVersionManager.GetNewestVersion();
+            var newestVersion = GetNewestVersion();
             if (newestVersion != null)
             {
                 fn = newestVersion.Path + "\\TopSycm.exe";
@@ -41,20 +36,11 @@ namespace WeChatAddFriend.Version
             return fn;
         }
 
-        private static string GetReleaseVersionExeFileNameForTest()
-        {
-            var fn = InstalledVersionManager.StartUpPathOfExe + "Release\\TopSycm.exe";
-            if (!File.Exists(fn))
-            {
-                fn = null;
-            }
-            return fn;
-        }
 
         public static void SaveVersionToConfigFile(int v)
         {
-            string fn = PathEx.ParentOfExePath + "config.ini";
-            FileEx.SaveToFile(fn, ShareUtil.ConvertVersionToString(v));
+            string fn = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"config.ini");
+            File.WriteAllText(fn, ShareUtil.ConvertVersionToString(v));
         }
 
         private static string GetExeFileNameFromConfigFile()
@@ -62,7 +48,7 @@ namespace WeChatAddFriend.Version
             var exeFn = string.Empty;
             try
             {
-                var path = InstalledVersionManager.StartUpPathOfExe + "Config.ini";
+                var path = StartUpPathOfExe + "Config.ini";
                 using (var reader = new StreamReader(path))
                 {
                     string fullVersion = reader.ReadToEnd().Trim();
@@ -73,7 +59,7 @@ namespace WeChatAddFriend.Version
                         int version = Convert.ToInt32(subVs[0]) * 10000;
                         version += Convert.ToInt32(subVs[1]) * 100;
                         version += Convert.ToInt32(subVs[2]);
-                        exeFn = InstalledVersionManager.GetExistPathByVersion(version) + "\\TopSycm.exe";
+                        exeFn = GetExistPathByVersion(version) + "\\WeChatAddFriend.exe";
                     }
                 }
                 if (!string.IsNullOrEmpty(exeFn) && !File.Exists(exeFn))
@@ -91,12 +77,12 @@ namespace WeChatAddFriend.Version
         public static List<InstalledVersion> GetAllInstalledVersionAndSortByVersionDesc()
         {
             var installedVersions = new List<InstalledVersion>();
-            var dirts = Directory.GetDirectories(PathEx.ParentOfExePath, "v*");
+            var dirts = Directory.GetDirectories(AppDomain.CurrentDomain.BaseDirectory, "v*");
             if (dirts != null && dirts.Length != 0)
             {
                 foreach (string dir in dirts)
                 {
-                    var versionFromDir = InstalledVersionManager.GetVersionFromDir(dir);
+                    var versionFromDir = GetVersionFromDir(dir);
                     if (versionFromDir > 0)
                     {
                         installedVersions.Add(new InstalledVersion
@@ -127,7 +113,7 @@ namespace WeChatAddFriend.Version
         public static InstalledVersion GetNewestVersion()
         {
             InstalledVersion newestVersion = null;
-            var allInstalledVersions = InstalledVersionManager.GetAllInstalledVersionAndSortByVersionDesc();
+            var allInstalledVersions = GetAllInstalledVersionAndSortByVersionDesc();
             if (allInstalledVersions != null && allInstalledVersions.Count() > 0)
             {
                 newestVersion = allInstalledVersions[0];
@@ -135,20 +121,10 @@ namespace WeChatAddFriend.Version
             return newestVersion;
         }
 
-        public static int GetQianniuVersion()
-        {
-            var qnIniFile = PathEx.ParentOfExePath + "AliWorkbench\\AliWorkbench.ini";
-            if (!File.Exists(qnIniFile)) return 0;
-
-            var qnVersion = File.ReadLines(qnIniFile).Last().Replace("Version =", "");
-            var intVer = int.Parse(qnVersion.Replace(".", "").Replace("N", ""));
-            return intVer;
-        }
-
         private static string GetExistPathByVersion(int version)
         {
             var path = string.Empty;
-            var allInstalledVersions = InstalledVersionManager.GetAllInstalledVersionAndSortByVersionDesc();
+            var allInstalledVersions = GetAllInstalledVersionAndSortByVersionDesc();
             if (allInstalledVersions != null && allInstalledVersions.Count() > 0)
             {
                 InstalledVersion installedVersion = allInstalledVersions.SingleOrDefault(k => k.Version == version);
