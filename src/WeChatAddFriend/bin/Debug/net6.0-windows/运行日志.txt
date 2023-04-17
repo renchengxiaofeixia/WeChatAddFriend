@@ -1,0 +1,16 @@
+
+============  日志启动(2023/4/17 16:53:00)  ============
+Info(2023/4/17 16:53:32):开始升级，补丁={"isForceUpdate":false,"patchVersion":10004,"patchFileName":"v1.0.4_Patch.zip","patchSize":159738,"tip":"\u4F18\u5316\u7EC6\u8282"}
+
+Info(2023/4/17 16:53:38):新版本目录:D:\src\WeChatAddFriend\src\WeChatAddFriend\bin\Debug\v1.0.4
+
+Info(2023/4/17 16:53:39):缺少基础版本.....无法升级到最新版
+
+
+============  日志启动(2023/4/17 17:01:04)  ============
+Info(2023/4/17 17:01:17):开始升级，补丁={"isForceUpdate":false,"patchVersion":10004,"patchFileName":"v1.0.4_Patch.zip","patchSize":159738,"tip":"\u4F18\u5316\u7EC6\u8282"}
+
+Info(2023/4/17 17:01:21):新版本目录:D:\src\WeChatAddFriend\src\WeChatAddFriend\bin\Debug\v1.0.4
+
+Info(2023/4/17 17:01:21):缺少基础版本.....无法升级到最新版
+

@@ -289,6 +289,8 @@
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "微信加好友";
+            FormClosing += WeChatAddFriendForm_FormClosing;
+            FormClosed += WeChatAddFriendForm_FormClosed;
             ((System.ComponentModel.ISupportInitialize)dgPhones).EndInit();
             ctxMenu.ResumeLayout(false);
             ResumeLayout(false);

@@ -56,7 +56,10 @@ namespace WeChatAddFriend
             {
                 this.Visible = false;
                 LoginUserName = loginDto.UserName;
-                ClientUpdater.UpdateForTip(loginDto.Patch);
+                if (loginDto.Patch != null)
+                {
+                    ClientUpdater.UpdateForTip(loginDto.Patch);
+                }
                 new WeChatAddFriendForm().ShowDialog();
             }
         }

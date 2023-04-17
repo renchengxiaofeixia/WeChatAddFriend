@@ -109,7 +109,7 @@ namespace WeChatAddFriend
             var client = new HttpClient();
             using StringContent phoneNoContent = new(
                 JsonSerializer.Serialize(
-                    importPhoneNos.Select(phoneNo=>
+                    importPhoneNos.Select(phoneNo =>
                     new WeChatPhoneDto
                     {
                         PhoneNo = phoneNo,
@@ -1024,6 +1024,16 @@ namespace WeChatAddFriend
         {
             btnStopAddFriend.Visible = false;
             addFriendTokenSource.Cancel();
+        }
+
+        private void WeChatAddFriendForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+
+        }
+
+        private void WeChatAddFriendForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
         }
     }
 
