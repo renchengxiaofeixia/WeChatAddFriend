@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "7ZItmK6pP0eCi4WGYkdMkDSOT1LJ+vBfh9vKkqeQdt0=",
+  "Source": "WeChatAddFriendServer",
+  "BasePath": "_content/WeChatAddFriendServer",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
