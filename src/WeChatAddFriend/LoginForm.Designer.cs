@@ -94,6 +94,7 @@
             Name = "LoginForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "登录";
+            Load += LoginForm_Load;
             ResumeLayout(false);
             PerformLayout();
         }

@@ -44,7 +44,7 @@ namespace WeChatAddFriend
                 {
                     userName = txtUserName.Text.Trim(),
                     password = txtPassword.Text.Trim(),
-                    appVersion = latestVer ==null ? 0 : latestVer.Version
+                    appVersion = latestVer == null ? 0 : latestVer.Version
                 }),
                 Encoding.UTF8,
                 "application/json");
@@ -58,9 +58,21 @@ namespace WeChatAddFriend
                 LoginUserName = loginDto.UserName;
                 if (loginDto.Patch != null)
                 {
+#if !DEBUG
                     ClientUpdater.UpdateForTip(loginDto.Patch);
+#endif
                 }
                 new WeChatAddFriendForm().ShowDialog();
+            }
+        }
+
+        private void LoginForm_Load(object sender, EventArgs e)
+        {
+            if (File.Exists(Path.Combine(AppContext.BaseDirectory, "mj.txt")))
+            {
+                txtUserName.Text = "youmanju";
+                txtPassword.Text = "123";
+                btnLogin_Click(null, null);
             }
         }
     }

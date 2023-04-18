@@ -1,0 +1,6 @@
+D:\src\WeChatAddFriend\src\WeChatAddFriend\bin\Release\net6.0-windows\publish\WeChatAddFriend.exe
+D:\src\WeChatAddFriend\src\WeChatAddFriend\bin\Release\net6.0-windows\publish\WeChatAddFriend.dll
+D:\src\WeChatAddFriend\src\WeChatAddFriend\bin\Release\net6.0-windows\publish\WeChatAddFriend.deps.json
+D:\src\WeChatAddFriend\src\WeChatAddFriend\bin\Release\net6.0-windows\publish\WeChatAddFriend.runtimeconfig.json
+D:\src\WeChatAddFriend\src\WeChatAddFriend\bin\Release\net6.0-windows\publish\WeChatAddFriend.pdb
+D:\src\WeChatAddFriend\src\WeChatAddFriend\bin\Release\net6.0-windows\publish\ICSharpCode.SharpZipLib.dll
