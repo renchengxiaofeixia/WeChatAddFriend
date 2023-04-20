@@ -52,6 +52,15 @@
             lblDeviceNum = new Label();
             btnStopForwardMoments = new Button();
             btnStopAddFriend = new Button();
+            txtAddCount = new TextBox();
+            label7 = new Label();
+            label8 = new Label();
+            btnOpenTasks = new Button();
+            label9 = new Label();
+            txtMorningTime = new TextBox();
+            label10 = new Label();
+            txtAfterTime = new TextBox();
+            label11 = new Label();
             ((System.ComponentModel.ISupportInitialize)dgPhones).BeginInit();
             ctxMenu.SuspendLayout();
             SuspendLayout();
@@ -88,7 +97,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(129, 53);
+            label3.Location = new Point(122, 53);
             label3.Name = "label3";
             label3.Size = new Size(32, 15);
             label3.TabIndex = 6;
@@ -96,7 +105,7 @@
             // 
             // txtMint
             // 
-            txtMint.Location = new Point(98, 49);
+            txtMint.Location = new Point(97, 49);
             txtMint.Name = "txtMint";
             txtMint.Size = new Size(23, 23);
             txtMint.TabIndex = 7;
@@ -154,10 +163,10 @@
             // 
             dgPhones.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgPhones.Columns.AddRange(new DataGridViewColumn[] { phoneSerial, phoneName, phoneState });
-            dgPhones.Location = new Point(12, 86);
+            dgPhones.Location = new Point(12, 106);
             dgPhones.Name = "dgPhones";
             dgPhones.RowTemplate.Height = 25;
-            dgPhones.Size = new Size(554, 304);
+            dgPhones.Size = new Size(558, 284);
             dgPhones.TabIndex = 13;
             // 
             // phoneSerial
@@ -260,11 +269,106 @@
             btnStopAddFriend.VisibleChanged += btnStopAddFriend_VisibleChanged;
             btnStopAddFriend.Click += btnStopAddFriend_Click;
             // 
+            // txtAddCount
+            // 
+            txtAddCount.Location = new Point(97, 76);
+            txtAddCount.Name = "txtAddCount";
+            txtAddCount.Size = new Size(23, 23);
+            txtAddCount.TabIndex = 21;
+            txtAddCount.Text = "15";
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(122, 80);
+            label7.Name = "label7";
+            label7.Size = new Size(19, 15);
+            label7.TabIndex = 20;
+            label7.Text = "个";
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(12, 79);
+            label8.Name = "label8";
+            label8.Size = new Size(80, 15);
+            label8.TabIndex = 19;
+            label8.Text = "每次添加号码";
+            // 
+            // btnOpenTasks
+            // 
+            btnOpenTasks.Location = new Point(436, 71);
+            btnOpenTasks.Name = "btnOpenTasks";
+            btnOpenTasks.Size = new Size(100, 31);
+            btnOpenTasks.TabIndex = 22;
+            btnOpenTasks.Text = "打开任务管理";
+            btnOpenTasks.UseVisualStyleBackColor = true;
+            btnOpenTasks.Click += btnOpenTasks_Click;
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.ForeColor = Color.Red;
+            label9.Location = new Point(156, 80);
+            label9.Name = "label9";
+            label9.Size = new Size(31, 15);
+            label9.TabIndex = 23;
+            label9.Text = "上午";
+            // 
+            // txtMorningTime
+            // 
+            txtMorningTime.ForeColor = Color.Red;
+            txtMorningTime.Location = new Point(189, 76);
+            txtMorningTime.MaxLength = 2;
+            txtMorningTime.Name = "txtMorningTime";
+            txtMorningTime.Size = new Size(23, 23);
+            txtMorningTime.TabIndex = 24;
+            txtMorningTime.Text = "10";
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.ForeColor = Color.Red;
+            label10.Location = new Point(305, 80);
+            label10.Name = "label10";
+            label10.Size = new Size(91, 15);
+            label10.TabIndex = 25;
+            label10.Text = "点以后开始加人";
+            // 
+            // txtAfterTime
+            // 
+            txtAfterTime.ForeColor = Color.Red;
+            txtAfterTime.Location = new Point(278, 76);
+            txtAfterTime.MaxLength = 2;
+            txtAfterTime.Name = "txtAfterTime";
+            txtAfterTime.Size = new Size(23, 23);
+            txtAfterTime.TabIndex = 27;
+            txtAfterTime.Text = "15";
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.ForeColor = Color.Red;
+            label11.Location = new Point(214, 80);
+            label11.Name = "label11";
+            label11.Size = new Size(61, 15);
+            label11.TabIndex = 28;
+            label11.Text = "点 和 下午";
+            // 
             // WeChatAddFriendForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(890, 412);
+            Controls.Add(label11);
+            Controls.Add(txtAfterTime);
+            Controls.Add(label10);
+            Controls.Add(txtMorningTime);
+            Controls.Add(label9);
+            Controls.Add(btnOpenTasks);
+            Controls.Add(txtAddCount);
+            Controls.Add(label7);
+            Controls.Add(label8);
             Controls.Add(btnAdd);
             Controls.Add(btnStopAddFriend);
             Controls.Add(btnForwardMoments);
@@ -284,7 +388,6 @@
             Controls.Add(txtLog);
             DoubleBuffered = true;
             MaximizeBox = false;
-            MinimizeBox = false;
             Name = "WeChatAddFriendForm";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterScreen;
@@ -322,5 +425,14 @@
         private Label lblDeviceNum;
         private Button btnStopForwardMoments;
         private Button btnStopAddFriend;
+        private TextBox txtAddCount;
+        private Label label7;
+        private Label label8;
+        private Button btnOpenTasks;
+        private Label label9;
+        private TextBox txtMorningTime;
+        private Label label10;
+        private TextBox txtAfterTime;
+        private Label label11;
     }
 }

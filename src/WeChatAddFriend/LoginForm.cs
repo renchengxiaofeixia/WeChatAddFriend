@@ -30,6 +30,8 @@ namespace WeChatAddFriend
             }
         }
 
+        private LoginUser loginUser;
+
         public LoginForm()
         {
             InitializeComponent();
@@ -68,14 +70,77 @@ namespace WeChatAddFriend
 
         private void LoginForm_Load(object sender, EventArgs e)
         {
+            loginUser = new LoginUser();
             if (File.Exists(Path.Combine(AppContext.BaseDirectory, "mj.txt")))
             {
                 txtUserName.Text = "youmanju";
                 txtPassword.Text = "123";
                 btnLogin_Click(null, null);
             }
+            else
+            {
+                loginUser = GetUser();
+                txtUserName.Text = loginUser.UserName;
+                txtPassword.Text = loginUser.Password;
+                if (loginUser.IsAutoLogin)
+                {
+                    btnLogin_Click(null, null);
+                }
+            }
+
+        }
+
+
+        private LoginUser GetUser()
+        {
+            var paramFn = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "loginuser");
+            if (!File.Exists(paramFn)) return loginUser;
+            var userJson = File.ReadAllText(paramFn);
+            if (!string.IsNullOrEmpty(userJson))
+            {
+                loginUser = JsonSerializer.Deserialize<LoginUser>(userJson);
+            }
+            return loginUser;
+        }
+
+        private void txtPassword_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                btnLogin_Click(null, null);
+            }
+        }
+
+        private void txtUserName_TextChanged(object sender, EventArgs e)
+        {
+            loginUser.UserName = txtUserName.Text.Trim();
+            WriteUser();
+        }
+
+        private void txtPassword_TextChanged(object sender, EventArgs e)
+        {
+            loginUser.Password = txtPassword.Text.Trim();
+            WriteUser();
+        }
+
+        void WriteUser()
+        {
+            var paramFn = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "loginuser");
+            File.WriteAllText(paramFn, JsonSerializer.Serialize(loginUser));
+        }
+
+        private void chkAutoLogin_CheckedChanged(object sender, EventArgs e)
+        {
+            loginUser.IsAutoLogin = chkAutoLogin.Checked;
+            WriteUser();
         }
     }
 
+    public class LoginUser
+    {
+        public string UserName { get; set; }
+        public string Password { get; set; }
+        public bool IsAutoLogin { get; set; }
+    }
 
 }

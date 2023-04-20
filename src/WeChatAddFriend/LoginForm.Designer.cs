@@ -33,12 +33,13 @@
             btnLogin = new Button();
             txtPassword = new TextBox();
             label2 = new Label();
+            chkAutoLogin = new CheckBox();
             SuspendLayout();
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(22, 15);
+            label1.Location = new Point(12, 15);
             label1.Name = "label1";
             label1.Size = new Size(32, 15);
             label1.TabIndex = 0;
@@ -46,14 +47,16 @@
             // 
             // txtUserName
             // 
-            txtUserName.Location = new Point(56, 12);
+            txtUserName.Location = new Point(50, 12);
             txtUserName.Name = "txtUserName";
-            txtUserName.Size = new Size(138, 23);
+            txtUserName.Size = new Size(198, 23);
             txtUserName.TabIndex = 0;
+            txtUserName.TextChanged += txtUserName_TextChanged;
+            txtUserName.KeyUp += txtPassword_KeyUp;
             // 
             // btnLogin
             // 
-            btnLogin.Location = new Point(119, 79);
+            btnLogin.Location = new Point(173, 70);
             btnLogin.Name = "btnLogin";
             btnLogin.Size = new Size(75, 23);
             btnLogin.TabIndex = 2;
@@ -63,26 +66,41 @@
             // 
             // txtPassword
             // 
-            txtPassword.Location = new Point(56, 41);
+            txtPassword.Location = new Point(50, 41);
             txtPassword.Name = "txtPassword";
             txtPassword.PasswordChar = '#';
-            txtPassword.Size = new Size(138, 23);
+            txtPassword.Size = new Size(198, 23);
             txtPassword.TabIndex = 1;
+            txtPassword.TextChanged += txtPassword_TextChanged;
+            txtPassword.KeyUp += txtPassword_KeyUp;
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(22, 44);
+            label2.Location = new Point(12, 44);
             label2.Name = "label2";
             label2.Size = new Size(32, 15);
             label2.TabIndex = 3;
             label2.Text = "密码";
             // 
+            // chkAutoLogin
+            // 
+            chkAutoLogin.AutoSize = true;
+            chkAutoLogin.Location = new Point(91, 73);
+            chkAutoLogin.Name = "chkAutoLogin";
+            chkAutoLogin.Size = new Size(76, 19);
+            chkAutoLogin.TabIndex = 4;
+            chkAutoLogin.Text = "自动登录";
+            chkAutoLogin.UseVisualStyleBackColor = true;
+            chkAutoLogin.Visible = false;
+            chkAutoLogin.CheckedChanged += chkAutoLogin_CheckedChanged;
+            // 
             // LoginForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(224, 111);
+            ClientSize = new Size(271, 103);
+            Controls.Add(chkAutoLogin);
             Controls.Add(txtPassword);
             Controls.Add(label2);
             Controls.Add(btnLogin);
@@ -106,5 +124,6 @@
         private Button btnLogin;
         private TextBox txtPassword;
         private Label label2;
+        private CheckBox chkAutoLogin;
     }
 }

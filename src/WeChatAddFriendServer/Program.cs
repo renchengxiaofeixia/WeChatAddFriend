@@ -130,6 +130,7 @@ class AppDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<AppPatch> AppPatchs { get; set; }
     public DbSet<WeChatPhone> WeChatPhones { get; set; }
+    public DbSet<UserPhone> UserPhones { get; set; }
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 }
 
@@ -156,6 +157,17 @@ class User
     public int Id { get; set; }
     public string? UserName { get; set; }
     public string? Password { get; set; }
+    public DateTime CreateTime { get; set; } = DateTime.Now;
+    public string? Creator { get; set; }
+}
+
+class UserPhone
+{
+    public int Id { get; set; }
+    public string Serial { get; set; }
+    public string Model { get; set; }
+    public string Product { get; set; }
+    public string Name { get; set; }
     public DateTime CreateTime { get; set; } = DateTime.Now;
     public string? Creator { get; set; }
 }
