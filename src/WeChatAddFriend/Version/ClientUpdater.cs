@@ -40,10 +40,10 @@ namespace WeChatAddFriend.Version
 
         public static void UpdateForTip(AppPatchDto appver)
         {
-            if (!appver.isForceUpdate)
+            if (!appver.IsForceUpdate)
             {
-                var ver = ShareUtil.ConvertVersionToString(appver.patchVersion);
-                var msg = string.Format("发现新版【{0}】，解决问题：\r\n\r\n{1}\r\n\r\n是否升级?", ver, appver.tip);
+                var ver = ShareUtil.ConvertVersionToString(appver.PatchVersion);
+                var msg = string.Format("发现新版【{0}】，解决问题：\r\n\r\n{1}\r\n\r\n是否升级?", ver, appver.Tip);
                 if (MessageBox.Show(msg, "升级提示", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     UpdateAsync(appver);
@@ -68,23 +68,23 @@ namespace WeChatAddFriend.Version
                 try
                 {
                     Log.Info(string.Format("开始升级，补丁={0}", JsonSerializer.Serialize(appver)));
-                    var newVerDir = Path.Combine(ParentOfExePath, ShareUtil.ConvertVersionToString(appver.patchVersion));
-                    NetUtil.DownFile($"{LoginForm.url}/files/{appver.patchFileName}", _patchFn, appver.patchSize);
+                    var newVerDir = Path.Combine(ParentOfExePath, ShareUtil.ConvertVersionToString(appver.PatchVersion));
+                    NetUtil.DownFile($"{LoginForm.url}/files/{appver.PatchFileName}", _patchFn, appver.PatchSize);
                     DirectoryEx.DeleteC(newVerDir, true);
                     Log.Info($"新版本目录:{newVerDir}");
                     CopyBaseFile(newVerDir);
                     Zip.UnZipFile(_patchFn, newVerDir, null);
                     File.Delete(_patchFn);
                     //DeleteOldVersion(ent.DeleteVersions, ent.DeleteVersionLessThan, ent.PatchVersion);
-                    InstalledVersionManager.SaveVersionToConfigFile(appver.patchVersion);
-                    if (appver.isForceUpdate)
+                    InstalledVersionManager.SaveVersionToConfigFile(appver.PatchVersion);
+                    if (appver.IsForceUpdate)
                     {
-                        var msg = string.Format("{0}已升级到版本{1},{0}将自动重启。\r\n\r\n升级信息:{2}", "软件", ShareUtil.ConvertVersionToString(appver.patchVersion), appver.tip);
+                        var msg = string.Format("{0}已升级到版本{1},{0}将自动重启。\r\n\r\n升级信息:{2}", "软件", ShareUtil.ConvertVersionToString(appver.PatchVersion), appver.Tip);
                         windowsFormsSynchronizationContext.Send(k =>MessageBox.Show(msg, "软件升级"), null);
                     }
                     else
                     {
-                        var msg = string.Format("{0}已升级到版本{1},是否立即重启软件，使用新版本？", "软件", ShareUtil.ConvertVersionToString(appver.patchVersion));
+                        var msg = string.Format("{0}已升级到版本{1},是否立即重启软件，使用新版本？", "软件", ShareUtil.ConvertVersionToString(appver.PatchVersion));
 
                         windowsFormsSynchronizationContext.Send(k =>
                         {

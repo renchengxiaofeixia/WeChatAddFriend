@@ -25,13 +25,33 @@ namespace WeChatAddFriend
 
     public class AppPatchDto
     {
-        public bool isForceUpdate { get; set; }
-        public int patchVersion { get; set; }
-        public string patchFileName { get; set; }
-        public int patchSize { get; set; }
-        public string tip { get; set; }
+        [JsonPropertyName("isForceUpdate")]
+        public bool IsForceUpdate { get; set; }
+        [JsonPropertyName("patchVersion")]
+        public int PatchVersion { get; set; }
+        [JsonPropertyName("patchFileName")]
+        public string PatchFileName { get; set; }
+        [JsonPropertyName("patchSize")]
+        public int PatchSize { get; set; }
+        [JsonPropertyName("tip")]
+        public string Tip { get; set; }
     }
 
+    class UserPhoneDto
+    {
+        [JsonPropertyName("serial")]
+        public string Serial { get; set; }
+        [JsonPropertyName("model")]
+        public string Model { get; set; }
+        [JsonPropertyName("product")]
+        public string Product { get; set; }
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+        [JsonPropertyName("phoneId")]
+        public int PhoneId { get; set; }
+        [JsonPropertyName("creator")]
+        public string? Creator { get; set; }
+    }
 
     public class WeChatPhoneDto
     {

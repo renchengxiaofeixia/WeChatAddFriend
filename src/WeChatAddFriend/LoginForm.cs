@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Reflection.Metadata;
 using System.Security.Policy;
 using System.Text;
@@ -16,6 +17,7 @@ namespace WeChatAddFriend
 {
     public partial class LoginForm : Form
     {
+        //public static string url = "http://127.0.0.1:31005";
         public static string url = "http://112.74.19.214:31005";
 
         public static string LoginUserName = string.Empty;
@@ -64,8 +66,18 @@ namespace WeChatAddFriend
                     ClientUpdater.UpdateForTip(loginDto.Patch);
 #endif
                 }
+
+                LoadUserPhones(LoginUserName);
                 new WeChatAddFriendForm().ShowDialog();
             }
+        }
+
+        async void LoadUserPhones(string userName)
+        { 
+            var res = await new HttpClient().GetAsync($"{LoginForm.url}/getuserphones/{userName}");
+            var userPhoneJson = await res.Content.ReadAsStringAsync();
+            var paramFn = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "userPhones");
+            File.WriteAllText(paramFn, userPhoneJson);
         }
 
         private void LoginForm_Load(object sender, EventArgs e)
@@ -102,6 +114,11 @@ namespace WeChatAddFriend
             }
             return loginUser;
         }
+        void WriteUser()
+        {
+            var paramFn = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "loginuser");
+            File.WriteAllText(paramFn, JsonSerializer.Serialize(loginUser));
+        }
 
         private void txtPassword_KeyUp(object sender, KeyEventArgs e)
         {
@@ -121,12 +138,6 @@ namespace WeChatAddFriend
         {
             loginUser.Password = txtPassword.Text.Trim();
             WriteUser();
-        }
-
-        void WriteUser()
-        {
-            var paramFn = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "loginuser");
-            File.WriteAllText(paramFn, JsonSerializer.Serialize(loginUser));
         }
 
         private void chkAutoLogin_CheckedChanged(object sender, EventArgs e)

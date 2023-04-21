@@ -1,4 +1,7 @@
 ﻿using System.Diagnostics;
+using System.Security.Policy;
+using System.Text.Json;
+using System.Text;
 using System.Text.Json.Serialization;
 using WeChatAddFriend.Version;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
@@ -9,7 +12,7 @@ namespace WeChatAddFriend
     {
         [STAThread]
         static void Main()
-        {
+        {            
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
             Application.ThreadException += new ThreadExceptionEventHandler(Application_ThreadException);
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);

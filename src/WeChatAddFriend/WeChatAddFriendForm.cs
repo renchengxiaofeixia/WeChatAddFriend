@@ -1,6 +1,7 @@
 ﻿using AdvancedSharpAdbClient;
 using AdvancedSharpAdbClient.DeviceCommands;
 using AdvancedSharpAdbClient.Receivers;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -23,6 +24,8 @@ namespace WeChatAddFriend
         private static string importFilePath = string.Empty;
         public List<string> importPhoneNos { get; set; }
         private List<string> addedPhoneNos = new List<string>();
+
+        private List<UserPhoneDto> userPhones = new List<UserPhoneDto>();
         DateTime lastAddFriendTime;
         Params appParams;
 
@@ -297,7 +300,7 @@ namespace WeChatAddFriend
                     add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/k_u']", TimeSpan.FromSeconds(2));
                     if (add != null)
                     {
-                        adbClient.Click(d, add.endCords.x - 2,add.endCords.y -2);
+                        adbClient.Click(d, add.endCords.x - 2, add.endCords.y - 2);
                         await Task.Delay(1000);
                     }
 
@@ -996,15 +999,47 @@ namespace WeChatAddFriend
             //    }
             //}
 
+            userPhones = GetUserPhones();
             var dvs = dgPhones.DataSource as List<DeviceData>;
             dvs = dvs ?? new List<DeviceData>();
             devices = devices.Where(k => k.State == DeviceState.Online).ToList();
             var diffCount = devices.ExceptBy(dvs.Select(k => k.Serial), d => d.Serial).Count();
             if (dvs == null || diffCount > 0 || devices.Count != dvs.Count)
             {
+                //var dys = dgPhones.DataSource as IEnumerable<dynamic>;
+                //var diffs = dvs.ExceptBy(dys==null ? new List<string>() : dys.Select(dy=>dy.Serial),d=>d.Serial);
+                //if (!diffs.Any()) return;
+
                 this.InvokeOnUiThreadIfRequired(() =>
                 {
-                    dgPhones.DataSource = devices;
+                    var maxPhoneId = userPhones.Count < 1 ? 0 : userPhones.Max(k => k.PhoneId);
+                    dgPhones.DataSource = devices.Select(k =>
+                    {
+                        var phone = userPhones.FirstOrDefault(j => j.Serial == k.Serial);
+                        if (phone == null)
+                        {
+                            phone = new UserPhoneDto
+                            {
+                                Serial = k.Serial,
+                                Name = k.Name,
+                                Model = k.Model,
+                                Product = k.Product,
+                                PhoneId = ++maxPhoneId,
+                                Creator = LoginForm.LoginUserName
+                            };
+                            userPhones.Add(phone);
+                            //保存手机序号
+                            WriteUserPhones();
+                        }
+
+                        return new
+                        {
+                            k.Serial,
+                            k.Name,
+                            k.State,
+                            phone.PhoneId
+                        };
+                    }).OrderBy(k => k.PhoneId).ToList();
                 });
             }
 
@@ -1152,6 +1187,36 @@ namespace WeChatAddFriend
             addFriendTokenSource.Cancel();
         }
 
+        private List<UserPhoneDto> GetUserPhones()
+        {
+            var paramFn = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "userPhones");
+            if (!File.Exists(paramFn)) return userPhones;
+            var userPhoneJson = File.ReadAllText(paramFn);
+            if (!string.IsNullOrEmpty(userPhoneJson))
+            {
+                userPhones = JsonSerializer.Deserialize<List<UserPhoneDto>>(userPhoneJson);
+            }
+            return userPhones;
+        }
+
+        async void WriteUserPhones()
+        {
+            var paramFn = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "userPhones");
+            File.WriteAllText(paramFn, JsonSerializer.Serialize(userPhones));
+
+            var client = new HttpClient();
+            using StringContent userPhoneContent = new(
+                JsonSerializer.Serialize(userPhones),
+                Encoding.UTF8, "application/json");
+            var idx = 0;
+            while (idx < 3)
+            {
+                var res = await client.PostAsync($"{LoginForm.url}/adduserphone", userPhoneContent);
+                if (res.IsSuccessStatusCode) break;
+                idx++;
+            }
+        }
+
         private void WeChatAddFriendForm_FormClosing(object sender, FormClosingEventArgs e)
         {
 
@@ -1176,6 +1241,42 @@ namespace WeChatAddFriend
                     adbClient.SendKeyEvent(d, "187");
                 });
             });
+        }
+
+        private async void 转发朋友圈ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (adbClient == null) return;
+            dynamic dy = dgPhones.CurrentRow.DataBoundItem;
+            var d = adbClient.GetDevices().FirstOrDefault(k => k.State == DeviceState.Online && k.Serial == dy.Serial);
+            if (d == null) return;
+            await ForwardMoments(d, txtWeChatNo.Text.Trim());
+        }
+
+        private async void 微信加好友ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (adbClient == null) return;
+            dynamic dy = dgPhones.CurrentRow.DataBoundItem;
+            var d = adbClient.GetDevices().FirstOrDefault(k=>k.State == DeviceState.Online && k.Serial == dy.Serial);
+            if (d == null) return;
+            //去除已经添加过手机号码
+            importPhoneNos = importPhoneNos.Except(addedPhoneNos).ToList();
+            File.WriteAllLines(importFilePath, importPhoneNos);
+            this.InvokeOnUiThreadIfRequired(() =>
+            {
+                btnImportData.Text = $"导入数据({importPhoneNos.Count()}条)";
+            });
+            await Task.Run(async () =>
+            {
+                try
+                {
+                    if (int.TryParse(txtAddCount.Text.Trim(), out int avgPhoneNoCnt))
+                    {
+                        await AddFriendTask(d, importPhoneNos.Take(avgPhoneNoCnt).ToList(), addFriendTokenSource);
+                    }
+                }
+                catch { }
+
+            }, addFriendTokenSource.Token);
         }
     }
 

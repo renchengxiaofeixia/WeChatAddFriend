@@ -79,6 +79,39 @@ app.MapPost("/addwechat", async (AppDbContext db, List<WeChatPhoneDto> wechatPho
     return Results.Ok(new { IsOk = true });
 });
 
+app.MapGet("/getuserphones/{userName}", async (AppDbContext db, string userName) =>
+{
+    var userPhoneDtos = db.UserPhones.Where(k=>k.Creator == userName).Select(userPhone =>
+        new UserPhoneDto()
+        {
+            Creator = userPhone.Creator,
+            PhoneId = userPhone.PhoneId,
+            Serial = userPhone.Serial,
+            Model = userPhone.Model,
+            Name = userPhone.Name,
+            Product = userPhone.Product,
+        });
+    return Results.Ok(userPhoneDtos);
+});
+
+app.MapPost("/adduserphone", async (AppDbContext db, List<UserPhoneDto> userPhoneDto) =>
+{
+    var userPhones = userPhoneDto.Select(userPhoneDto =>
+        new UserPhone()
+        {
+            CreateTime = DateTime.Now,
+            Creator = userPhoneDto.Creator,
+            PhoneId = userPhoneDto.PhoneId,
+            Serial =    userPhoneDto.Serial,
+            Model = userPhoneDto.Model,
+            Name = userPhoneDto.Name,
+            Product = userPhoneDto.Product,
+        });
+    await db.UserPhones.AddRangeAsync(userPhones);
+    await db.SaveChangesAsync();
+    return Results.Ok(new { IsOk = true });
+});
+
 app.MapPost("/upload", async Task<IResult> (AppDbContext db, HttpRequest request,string patchFileName,int patchVersion,string tip, bool isForceUpdate) =>
 {
     if (!request.HasFormContentType)
@@ -161,9 +194,21 @@ class User
     public string? Creator { get; set; }
 }
 
+class UserPhoneDto
+{
+    public int Id { get; set; }
+    public int PhoneId { get; set; }
+    public string Serial { get; set; }
+    public string Model { get; set; }
+    public string Product { get; set; }
+    public string Name { get; set; }
+    public string? Creator { get; set; }
+}
+
 class UserPhone
 {
     public int Id { get; set; }
+    public int PhoneId { get; set; }
     public string Serial { get; set; }
     public string Model { get; set; }
     public string Product { get; set; }

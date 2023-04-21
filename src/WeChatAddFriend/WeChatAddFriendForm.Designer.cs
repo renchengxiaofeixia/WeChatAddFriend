@@ -40,12 +40,15 @@
             txtWeChatNo = new TextBox();
             label4 = new Label();
             dgPhones = new DataGridView();
+            PhoneId = new DataGridViewTextBoxColumn();
             phoneSerial = new DataGridViewTextBoxColumn();
             phoneName = new DataGridViewTextBoxColumn();
             phoneState = new DataGridViewTextBoxColumn();
             ctxMenu = new ContextMenuStrip(components);
             转为WIFI连接ToolStripMenuItem = new ToolStripMenuItem();
             断开连接ToolStripMenuItem = new ToolStripMenuItem();
+            转发朋友圈ToolStripMenuItem1 = new ToolStripMenuItem();
+            微信加好友ToolStripMenuItem1 = new ToolStripMenuItem();
             txtHour = new TextBox();
             label5 = new Label();
             label6 = new Label();
@@ -162,12 +165,19 @@
             // dgPhones
             // 
             dgPhones.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgPhones.Columns.AddRange(new DataGridViewColumn[] { phoneSerial, phoneName, phoneState });
+            dgPhones.Columns.AddRange(new DataGridViewColumn[] { PhoneId, phoneSerial, phoneName, phoneState });
+            dgPhones.ContextMenuStrip = ctxMenu;
             dgPhones.Location = new Point(12, 106);
             dgPhones.Name = "dgPhones";
             dgPhones.RowTemplate.Height = 25;
             dgPhones.Size = new Size(558, 284);
             dgPhones.TabIndex = 13;
+            // 
+            // PhoneId
+            // 
+            PhoneId.DataPropertyName = "PhoneId";
+            PhoneId.HeaderText = "PhoneId";
+            PhoneId.Name = "PhoneId";
             // 
             // phoneSerial
             // 
@@ -192,15 +202,16 @@
             // 
             // ctxMenu
             // 
-            ctxMenu.Items.AddRange(new ToolStripItem[] { 转为WIFI连接ToolStripMenuItem, 断开连接ToolStripMenuItem });
+            ctxMenu.Items.AddRange(new ToolStripItem[] { 转为WIFI连接ToolStripMenuItem, 断开连接ToolStripMenuItem, 转发朋友圈ToolStripMenuItem1, 微信加好友ToolStripMenuItem1 });
             ctxMenu.Name = "ctxMenu";
-            ctxMenu.Size = new Size(149, 48);
+            ctxMenu.Size = new Size(149, 92);
             // 
             // 转为WIFI连接ToolStripMenuItem
             // 
             转为WIFI连接ToolStripMenuItem.Name = "转为WIFI连接ToolStripMenuItem";
             转为WIFI连接ToolStripMenuItem.Size = new Size(148, 22);
             转为WIFI连接ToolStripMenuItem.Text = "转为WIFI连接";
+            转为WIFI连接ToolStripMenuItem.Visible = false;
             转为WIFI连接ToolStripMenuItem.Click += 转为WIFI连接ToolStripMenuItem_Click;
             // 
             // 断开连接ToolStripMenuItem
@@ -208,7 +219,22 @@
             断开连接ToolStripMenuItem.Name = "断开连接ToolStripMenuItem";
             断开连接ToolStripMenuItem.Size = new Size(148, 22);
             断开连接ToolStripMenuItem.Text = "断开WIFI连接";
+            断开连接ToolStripMenuItem.Visible = false;
             断开连接ToolStripMenuItem.Click += 断开连接ToolStripMenuItem_Click;
+            // 
+            // 转发朋友圈ToolStripMenuItem1
+            // 
+            转发朋友圈ToolStripMenuItem1.Name = "转发朋友圈ToolStripMenuItem1";
+            转发朋友圈ToolStripMenuItem1.Size = new Size(148, 22);
+            转发朋友圈ToolStripMenuItem1.Text = "转发朋友圈";
+            转发朋友圈ToolStripMenuItem1.Click += 转发朋友圈ToolStripMenuItem1_Click;
+            // 
+            // 微信加好友ToolStripMenuItem1
+            // 
+            微信加好友ToolStripMenuItem1.Name = "微信加好友ToolStripMenuItem1";
+            微信加好友ToolStripMenuItem1.Size = new Size(148, 22);
+            微信加好友ToolStripMenuItem1.Text = "微信加好友";
+            微信加好友ToolStripMenuItem1.Click += 微信加好友ToolStripMenuItem1_Click;
             // 
             // txtHour
             // 
@@ -414,9 +440,6 @@
         private Label label4;
         private DataGridView dgPhones;
         private ContextMenuStrip ctxMenu;
-        private DataGridViewTextBoxColumn phoneSerial;
-        private DataGridViewTextBoxColumn phoneName;
-        private DataGridViewTextBoxColumn phoneState;
         private ToolStripMenuItem 转为WIFI连接ToolStripMenuItem;
         private ToolStripMenuItem 断开连接ToolStripMenuItem;
         private TextBox txtHour;
@@ -434,5 +457,11 @@
         private Label label10;
         private TextBox txtAfterTime;
         private Label label11;
+        private DataGridViewTextBoxColumn PhoneId;
+        private DataGridViewTextBoxColumn phoneSerial;
+        private DataGridViewTextBoxColumn phoneName;
+        private DataGridViewTextBoxColumn phoneState;
+        private ToolStripMenuItem 转发朋友圈ToolStripMenuItem1;
+        private ToolStripMenuItem 微信加好友ToolStripMenuItem1;
     }
 }
