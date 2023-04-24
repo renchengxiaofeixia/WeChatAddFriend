@@ -66,7 +66,6 @@ namespace WeChatAddFriend
                     ClientUpdater.UpdateForTip(loginDto.Patch);
 #endif
                 }
-
                 LoadUserPhones(LoginUserName);
                 new WeChatAddFriendForm().ShowDialog();
             }
@@ -99,7 +98,6 @@ namespace WeChatAddFriend
                     btnLogin_Click(null, null);
                 }
             }
-
         }
 
 

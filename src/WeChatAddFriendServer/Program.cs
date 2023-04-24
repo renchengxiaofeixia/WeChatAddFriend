@@ -94,9 +94,9 @@ app.MapGet("/getuserphones/{userName}", async (AppDbContext db, string userName)
     return Results.Ok(userPhoneDtos);
 });
 
-app.MapPost("/adduserphone", async (AppDbContext db, List<UserPhoneDto> userPhoneDto) =>
+app.MapPost("/adduserphone", async (AppDbContext db, List<UserPhoneDto> userPhoneDtos) =>
 {
-    var userPhones = userPhoneDto.Select(userPhoneDto =>
+    var userPhones = userPhoneDtos.Select(userPhoneDto =>
         new UserPhone()
         {
             CreateTime = DateTime.Now,

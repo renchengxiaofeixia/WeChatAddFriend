@@ -80,12 +80,14 @@ namespace WeChatAddFriend.Version
                     if (appver.IsForceUpdate)
                     {
                         var msg = string.Format("{0}已升级到版本{1},{0}将自动重启。\r\n\r\n升级信息:{2}", "软件", ShareUtil.ConvertVersionToString(appver.PatchVersion), appver.Tip);
-                        windowsFormsSynchronizationContext.Send(k =>MessageBox.Show(msg, "软件升级"), null);
+                        windowsFormsSynchronizationContext.Send(k => { 
+                            MessageBox.Show(msg, "软件升级");
+                            Reboot();
+                        }, null);
                     }
                     else
                     {
                         var msg = string.Format("{0}已升级到版本{1},是否立即重启软件，使用新版本？", "软件", ShareUtil.ConvertVersionToString(appver.PatchVersion));
-
                         windowsFormsSynchronizationContext.Send(k =>
                         {
                             if (MessageBox.Show(msg, "提示", MessageBoxButtons.YesNo) == DialogResult.Yes)

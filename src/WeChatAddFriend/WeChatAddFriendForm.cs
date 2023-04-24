@@ -330,9 +330,13 @@ namespace WeChatAddFriend
                     //await Task.Delay(min * 60 * 1000);
                     SleepWithDoEvent(min * 60 * 1000);
 
-
-
                     addedPhoneNos.Add(phoneNos[idx]);
+
+                    if (addedPhoneNos.Count >= importPhoneNos.Count)
+                    {
+                        PrintLog("导入的手机号码已经全部添加完，请到导入新的数据！！！");
+                    }
+
                     if (addFriendTokenSource.Token.IsCancellationRequested)
                     {
                         PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} 加人任务被取消");
