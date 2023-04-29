@@ -64,6 +64,8 @@
             label10 = new Label();
             txtAfterTime = new TextBox();
             label11 = new Label();
+            txtDataFrom = new TextBox();
+            label12 = new Label();
             ((System.ComponentModel.ISupportInitialize)dgPhones).BeginInit();
             ctxMenu.SuspendLayout();
             SuspendLayout();
@@ -80,7 +82,7 @@
             // 
             // btnImportData
             // 
-            btnImportData.Location = new Point(123, 10);
+            btnImportData.Location = new Point(118, 10);
             btnImportData.Name = "btnImportData";
             btnImportData.Size = new Size(100, 31);
             btnImportData.TabIndex = 4;
@@ -350,6 +352,7 @@
             txtMorningTime.Size = new Size(23, 23);
             txtMorningTime.TabIndex = 24;
             txtMorningTime.Text = "10";
+            txtMorningTime.TextChanged += txtMorningTime_TextChanged;
             // 
             // label10
             // 
@@ -370,6 +373,7 @@
             txtAfterTime.Size = new Size(23, 23);
             txtAfterTime.TabIndex = 27;
             txtAfterTime.Text = "15";
+            txtAfterTime.TextChanged += txtAfterTime_TextChanged;
             // 
             // label11
             // 
@@ -381,11 +385,32 @@
             label11.TabIndex = 28;
             label11.Text = "点 和 下午";
             // 
+            // txtDataFrom
+            // 
+            txtDataFrom.Location = new Point(196, 47);
+            txtDataFrom.Name = "txtDataFrom";
+            txtDataFrom.Size = new Size(57, 23);
+            txtDataFrom.TabIndex = 29;
+            txtDataFrom.Text = "三维家";
+            txtDataFrom.TextChanged += txtDataFrom_TextChanged;
+            // 
+            // label12
+            // 
+            label12.AutoSize = true;
+            label12.ForeColor = Color.MediumBlue;
+            label12.Location = new Point(160, 52);
+            label12.Name = "label12";
+            label12.Size = new Size(32, 15);
+            label12.TabIndex = 30;
+            label12.Text = "分类";
+            // 
             // WeChatAddFriendForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(890, 412);
+            Controls.Add(label12);
+            Controls.Add(txtDataFrom);
             Controls.Add(label11);
             Controls.Add(txtAfterTime);
             Controls.Add(label10);
@@ -463,5 +488,7 @@
         private DataGridViewTextBoxColumn phoneState;
         private ToolStripMenuItem 转发朋友圈ToolStripMenuItem1;
         private ToolStripMenuItem 微信加好友ToolStripMenuItem1;
+        private TextBox txtDataFrom;
+        private Label label12;
     }
 }

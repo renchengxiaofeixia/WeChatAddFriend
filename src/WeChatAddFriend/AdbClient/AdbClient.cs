@@ -179,6 +179,28 @@ namespace AdvancedSharpAdbClient
             }
         }
 
+        public void Push(DeviceData device,string command)
+        {
+            EnsureDevice(device);
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
+            {
+                socket.SetDevice(device);
+                socket.SendAdbRequest($"shell:push {command}");
+                AdbResponse response = socket.ReadAdbResponse();
+            }
+        }
+
+        public void AppProcess(DeviceData device, string command)
+        {
+            EnsureDevice(device);
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
+            {
+                socket.SetDevice(device);
+                socket.SendAdbRequest($"shell:app_process {command}");
+                AdbResponse response = socket.ReadAdbResponse();
+            }
+        }
+
         public string GetDeviceIp(DeviceData device)
         {
             EnsureDevice(device);

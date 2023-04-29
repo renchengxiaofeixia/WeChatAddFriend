@@ -186,3 +186,113 @@ Exception(2023/4/21 10:12:26):System.Text.Json.JsonReaderException: The input do
 ============  日志启动(2023/4/21 13:22:53)  ============
 
 ============  日志启动(2023/4/23 14:22:04)  ============
+
+============  日志启动(2023/4/25 9:28:07)  ============
+
+============  日志启动(2023/4/25 9:28:55)  ============
+
+============  日志启动(2023/4/25 9:29:32)  ============
+
+============  日志启动(2023/4/25 9:31:07)  ============
+
+============  日志启动(2023/4/25 9:32:19)  ============
+
+============  日志启动(2023/4/26 12:02:58)  ============
+
+============  日志启动(2023/4/28 16:50:23)  ============
+Exception(2023/4/28 16:50:33):AdvancedSharpAdbClient.Exceptions.AdbException: An error occurred while reading a response from ADB: closed
+   at AdvancedSharpAdbClient.AdbSocket.ReadAdbResponse() in D:\src\WeChatAddFriend\src\WeChatAddFriend\AdbClient\AdbSocket.cs:line 265
+   at AdvancedSharpAdbClient.AdbClient.Push(DeviceData device, String fileName, String remotePath) in D:\src\WeChatAddFriend\src\WeChatAddFriend\AdbClient\AdbClient.cs:line 189
+   at WeChatAddFriend.WeChatAddFriendForm.<>c.<btnOpenTasks_Click>b__50_0() in D:\src\WeChatAddFriend\src\WeChatAddFriend\WeChatAddFriendForm.cs:line 1254
+   at System.Threading.Tasks.Task.InnerInvoke()
+   at System.Threading.Tasks.Task.<>c.<.cctor>b__272_0(Object obj)
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at WeChatAddFriend.WeChatAddFriendForm.btnOpenTasks_Click(Object sender, EventArgs e) in D:\src\WeChatAddFriend\src\WeChatAddFriend\WeChatAddFriendForm.cs:line 1247
+   at System.Threading.Tasks.Task.<>c.<ThrowAsync>b__128_0(Object state)
+
+Exception(2023/4/28 16:50:50):AdvancedSharpAdbClient.Exceptions.AdbException: An error occurred while reading a response from ADB: closed
+   at AdvancedSharpAdbClient.AdbSocket.ReadAdbResponse() in D:\src\WeChatAddFriend\src\WeChatAddFriend\AdbClient\AdbSocket.cs:line 265
+   at AdvancedSharpAdbClient.AdbClient.Push(DeviceData device, String fileName, String remotePath) in D:\src\WeChatAddFriend\src\WeChatAddFriend\AdbClient\AdbClient.cs:line 189
+   at WeChatAddFriend.WeChatAddFriendForm.<>c.<btnOpenTasks_Click>b__50_0() in D:\src\WeChatAddFriend\src\WeChatAddFriend\WeChatAddFriendForm.cs:line 1254
+   at System.Threading.Tasks.Task.InnerInvoke()
+   at System.Threading.Tasks.Task.<>c.<.cctor>b__272_0(Object obj)
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at WeChatAddFriend.WeChatAddFriendForm.btnOpenTasks_Click(Object sender, EventArgs e) in D:\src\WeChatAddFriend\src\WeChatAddFriend\WeChatAddFriendForm.cs:line 1247
+   at System.Threading.Tasks.Task.<>c.<ThrowAsync>b__128_0(Object state)
+
+
+============  日志启动(2023/4/28 16:51:30)  ============
+
+============  日志启动(2023/4/28 16:55:08)  ============
+
+============  日志启动(2023/4/28 16:55:41)  ============
+
+============  日志启动(2023/4/28 17:01:36)  ============
+
+============  日志启动(2023/4/28 17:05:53)  ============
+
+============  日志启动(2023/4/28 17:07:46)  ============
+
+============  日志启动(2023/4/28 17:08:11)  ============
+
+============  日志启动(2023/4/28 17:08:39)  ============
+
+============  日志启动(2023/4/28 17:08:56)  ============
+
+============  日志启动(2023/4/28 17:12:34)  ============
+
+============  日志启动(2023/4/28 17:16:55)  ============
+
+============  日志启动(2023/4/28 17:23:04)  ============
+
+============  日志启动(2023/4/28 17:25:00)  ============
+
+============  日志启动(2023/4/28 17:28:35)  ============
+
+============  日志启动(2023/4/29 9:15:20)  ============
+
+============  日志启动(2023/4/29 9:31:56)  ============
+
+============  日志启动(2023/4/29 9:32:47)  ============
+
+============  日志启动(2023/4/29 9:37:19)  ============
+
+============  日志启动(2023/4/29 9:42:32)  ============
+
+============  日志启动(2023/4/29 9:43:07)  ============
+
+============  日志启动(2023/4/29 9:51:11)  ============
+
+============  日志启动(2023/4/29 9:54:42)  ============
+
+============  日志启动(2023/4/29 9:55:08)  ============
+
+============  日志启动(2023/4/29 9:59:21)  ============
+
+============  日志启动(2023/4/29 10:12:32)  ============
+
+============  日志启动(2023/4/29 10:16:57)  ============
+
+============  日志启动(2023/4/29 10:27:46)  ============
+
+============  日志启动(2023/4/29 10:49:27)  ============
+
+============  日志启动(2023/4/29 10:52:04)  ============
+
+============  日志启动(2023/4/29 10:52:16)  ============
+
+============  日志启动(2023/4/29 11:20:51)  ============
+
+============  日志启动(2023/4/29 11:21:44)  ============
+
+============  日志启动(2023/4/29 11:25:20)  ============
+
+============  日志启动(2023/4/29 11:26:22)  ============
