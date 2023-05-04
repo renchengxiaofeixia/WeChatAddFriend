@@ -392,6 +392,7 @@
             txtDataFrom.Size = new Size(57, 23);
             txtDataFrom.TabIndex = 29;
             txtDataFrom.Text = "三维家";
+            txtDataFrom.Visible = false;
             txtDataFrom.TextChanged += txtDataFrom_TextChanged;
             // 
             // label12
@@ -403,6 +404,7 @@
             label12.Size = new Size(32, 15);
             label12.TabIndex = 30;
             label12.Text = "分类";
+            label12.Visible = false;
             // 
             // WeChatAddFriendForm
             // 

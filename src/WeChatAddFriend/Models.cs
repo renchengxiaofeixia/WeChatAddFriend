@@ -7,15 +7,14 @@ using System.Threading.Tasks;
 
 namespace WeChatAddFriend
 {
-
-    class UserDto
+    public class UserDto
     {
         public string UserName { get; set; }
         public string Password { get; set; }
         public int AppVersion { get; set; }
     }
 
-    class LoginDto
+    public class LoginDto
     {
         [JsonPropertyName("userName")]
         public string UserName { get; set; }
@@ -37,7 +36,7 @@ namespace WeChatAddFriend
         public string Tip { get; set; }
     }
 
-    class UserPhoneDto
+    public class UserPhoneDto
     {
         [JsonPropertyName("serial")]
         public string Serial { get; set; }

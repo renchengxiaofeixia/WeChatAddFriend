@@ -17,4 +17,15 @@ adb connect 192.168.1.101:5555
 # 断开连接
 adb disconnect
 
+# 查看用户列表
+adb shell pm list users
+# 启动分身微信   0是主用户应用   999是分身用户应用
+adb shell am start --user 0 com.tencent.mm/.ui.LauncherUI  
+adb shell am start --user 999 com.tencent.mm/.ui.LauncherUI  
+
+# 根据用户id查询用户空间的所有包
+adb shell pm list packages --user {userid}
+# 获取所有用户
+adb shell pm list users
+
 
