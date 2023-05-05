@@ -158,6 +158,7 @@ namespace WeChatAddFriend
 
                     if (avgPhoneNoCnt > 0)
                     {
+                        Log.Info("微信添加好友开始.......");
                         addedPhoneNos = new List<string>();
                         var idx = 0;
                         var tasks = new List<Task>();
@@ -177,6 +178,7 @@ namespace WeChatAddFriend
                     //分身微信添加好友
                     if (avgPhoneNoCnt > 0)
                     {
+                        Log.Info("微信分身添加好友开始.......");
                         addedPhoneNos = new List<string>();
                         var idx = 0;
                         var tasks = new List<Task>();
@@ -505,6 +507,7 @@ namespace WeChatAddFriend
                     var tasks = new List<Task>();
                     while (idx < devices.Count())
                     {
+                        Log.Info("微信转发朋友圈开始.......");
                         tasks.Add(ForwardMoments(devices[idx], txtWeChatNo.Text.Trim(), forwardMomentsTokenSource));
                         idx++;
                     }
@@ -517,6 +520,7 @@ namespace WeChatAddFriend
                     tasks = new List<Task>();
                     while (idx < devices.Count())
                     {
+                        Log.Info("微信分身转发朋友圈开始.......");
                         tasks.Add(ForwardMoments(devices[idx], txtWeChatNo.Text.Trim(), forwardMomentsTokenSource, true));
                         idx++;
                     }
