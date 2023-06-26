@@ -213,7 +213,6 @@
             转为WIFI连接ToolStripMenuItem.Name = "转为WIFI连接ToolStripMenuItem";
             转为WIFI连接ToolStripMenuItem.Size = new Size(148, 22);
             转为WIFI连接ToolStripMenuItem.Text = "转为WIFI连接";
-            转为WIFI连接ToolStripMenuItem.Visible = false;
             转为WIFI连接ToolStripMenuItem.Click += 转为WIFI连接ToolStripMenuItem_Click;
             // 
             // 断开连接ToolStripMenuItem
@@ -221,7 +220,6 @@
             断开连接ToolStripMenuItem.Name = "断开连接ToolStripMenuItem";
             断开连接ToolStripMenuItem.Size = new Size(148, 22);
             断开连接ToolStripMenuItem.Text = "断开WIFI连接";
-            断开连接ToolStripMenuItem.Visible = false;
             断开连接ToolStripMenuItem.Click += 断开连接ToolStripMenuItem_Click;
             // 
             // 转发朋友圈ToolStripMenuItem1

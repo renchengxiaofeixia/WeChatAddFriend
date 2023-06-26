@@ -184,7 +184,7 @@ namespace WeChatAddFriend
                         var tasks = new List<Task>();
                         while (idx < devices.Count)
                         {
-                            var task = AddFriendTask(devices[idx], importPhoneNos.Skip(idx * avgPhoneNoCnt).Take(avgPhoneNoCnt).ToList(), dataFrom, addFriendTokenSource,true);
+                            var task = AddFriendTask(devices[idx], importPhoneNos.Skip(idx * avgPhoneNoCnt).Take(avgPhoneNoCnt).ToList(), dataFrom, addFriendTokenSource, true);
                             tasks.Add(task);
                             idx++;
                         }
@@ -241,7 +241,11 @@ namespace WeChatAddFriend
         {
             return Task.Run(async () =>
             {
-                StartWeChat(d,useMultiApp);
+                StartWeChat(d, useMultiApp);
+
+                PrintLog($"正在执行{useMultiApp.ToString()}微信加人任务");
+
+
                 //回到首页
                 await BackWeChatHome(d);
 
@@ -259,7 +263,7 @@ namespace WeChatAddFriend
                     {
                         PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} 加人任务被取消");
                         cancellationTokenSource.Token.ThrowIfCancellationRequested();
-                    } 
+                    }
 
                     StartWeChat(d, useMultiApp);
 
@@ -537,7 +541,7 @@ namespace WeChatAddFriend
         /// <param name="d"></param>
         /// <param name="wxNo"></param>
         /// <returns></returns>
-        private Task ForwardMoments(DeviceData d, string wxNo, CancellationTokenSource forwardMomentsTokenSource,bool useMultiApp= false)
+        private Task ForwardMoments(DeviceData d, string wxNo, CancellationTokenSource forwardMomentsTokenSource, bool useMultiApp = false)
         {
             return Task.Run(async () =>
             {
@@ -547,6 +551,9 @@ namespace WeChatAddFriend
                     PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} 发圈任务被取消");
                 }
                 StartWeChat(d, useMultiApp);
+
+                PrintLog($"正在执行{useMultiApp.ToString()}微信发圈任务");
+
                 var savePicCount = 0;
                 var hasVideo = false;
                 await BackWeChatHome(d);
@@ -755,6 +762,21 @@ namespace WeChatAddFriend
 
                     //完成图片选择
                     add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/en']", TimeSpan.FromSeconds(2));
+                    if (add != null)
+                    {
+                        adbClient.Click(d, add.cords);
+                        await Task.Delay(1000);
+                    }
+
+                    add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/ox9' and @text='完成']", TimeSpan.FromSeconds(2));
+                    if (add != null)
+                    {
+                        adbClient.Click(d, add.cords);
+                        await Task.Delay(1000);
+                    }
+
+                    //完成图片选择  新版
+                    add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/ox9']", TimeSpan.FromSeconds(2));
                     if (add != null)
                     {
                         adbClient.Click(d, add.cords);
@@ -1054,7 +1076,8 @@ namespace WeChatAddFriend
 
         private void 转为WIFI连接ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var d = dgPhones.CurrentRow.DataBoundItem as DeviceData;
+            dynamic dto = dgPhones.CurrentRow.DataBoundItem;
+            var d = adbClient.GetDevices().FirstOrDefault(k => k.Serial == dto.Serial);
             var ip = adbClient.GetDeviceIp(d);
             adbClient.StartTcpIp(d);
             adbClient.Connect(ip);
@@ -1062,7 +1085,8 @@ namespace WeChatAddFriend
 
         private void 断开连接ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var d = dgPhones.CurrentRow.DataBoundItem as DeviceData;
+            dynamic dto = dgPhones.CurrentRow.DataBoundItem;
+            var d = adbClient.GetDevices().FirstOrDefault(k => k.Serial == dto.Serial);
             var ip = adbClient.GetDeviceIp(d);
             adbClient.Disconnect(new DnsEndPoint(ip, AdbClient.DefaultPort));
         }
@@ -1181,7 +1205,7 @@ namespace WeChatAddFriend
                     text = regex.Replace(text, ",");
                     string[] array = text.Split(',', StringSplitOptions.None);
                     int processId;
-                    if (array[2].EndsWith(":" + port) && array.Length >= 13 && int.TryParse(array[13], out processId))
+                    if (array[2].EndsWith(":" + port) && array.Length >= 13 && int.TryParse(array[12], out processId))
                     {
                         KillProcess(processId);
                     }
@@ -1440,7 +1464,7 @@ namespace WeChatAddFriend
             if (serilogOutputReceiver.Output.Count > 2)
             {
                 foreach (var output in serilogOutputReceiver.Output)
-                { 
+                {
                     var reg = new Regex("{(\\d{3}):(MultiApp|分身应用)");
                     var mch = reg.Match(output);
                     if (mch.Success)
@@ -1462,7 +1486,7 @@ namespace WeChatAddFriend
             adbClient.ExecuteRemoteCommand($"pm list packages --user {userId}", d, serilogOutputReceiver);
             if (serilogOutputReceiver.Output.Count > 0)
             {
-                foreach(var output in serilogOutputReceiver.Output)
+                foreach (var output in serilogOutputReceiver.Output)
                 {
                     if (output == "package:com.tencent.mm")
                     {

@@ -332,3 +332,166 @@ Exception(2023/4/28 16:50:50):AdvancedSharpAdbClient.Exceptions.AdbException: An
 ============  日志启动(2023/5/3 15:06:56)  ============
 
 ============  日志启动(2023/5/4 10:33:15)  ============
+
+============  日志启动(2023/5/8 12:11:05)  ============
+
+============  日志启动(2023/5/8 12:11:52)  ============
+Info(2023/5/8 12:14:51):微信添加好友开始.......
+
+Info(2023/5/8 12:15:55):微信添加好友开始.......
+
+
+============  日志启动(2023/5/8 12:16:12)  ============
+Info(2023/5/8 12:16:25):微信添加好友开始.......
+
+
+============  日志启动(2023/5/8 12:17:21)  ============
+Info(2023/5/8 12:17:32):微信添加好友开始.......
+
+
+============  日志启动(2023/5/8 12:17:43)  ============
+
+============  日志启动(2023/5/8 12:17:52)  ============
+Info(2023/5/8 12:18:01):微信添加好友开始.......
+
+
+============  日志启动(2023/6/2 17:53:40)  ============
+
+============  日志启动(2023/6/12 9:54:27)  ============
+
+============  日志启动(2023/6/26 9:44:27)  ============
+Exception(2023/6/26 9:44:45):System.ArgumentNullException: Value cannot be null. (Parameter 'device')
+   at AdvancedSharpAdbClient.AdbClient.EnsureDevice(DeviceData device) in D:\src\WeChatAddFriend\src\WeChatAddFriend\AdbClient\AdbClient.cs:line 1121
+   at AdvancedSharpAdbClient.AdbClient.GetDeviceIp(DeviceData device) in D:\src\WeChatAddFriend\src\WeChatAddFriend\AdbClient\AdbClient.cs:line 206
+   at WeChatAddFriend.WeChatAddFriendForm.转为WIFI连接ToolStripMenuItem_Click(Object sender, EventArgs e) in D:\src\WeChatAddFriend\src\WeChatAddFriend\WeChatAddFriendForm.cs:line 1058
+   at System.Windows.Forms.ToolStripItem.RaiseEvent(Object key, EventArgs e)
+   at System.Windows.Forms.ToolStripMenuItem.OnClick(EventArgs e)
+   at System.Windows.Forms.ToolStripItem.HandleClick(EventArgs e)
+   at System.Windows.Forms.ToolStripItem.HandleMouseUp(MouseEventArgs e)
+   at System.Windows.Forms.ToolStripItem.FireEventInteractive(EventArgs e, ToolStripItemEventType met)
+   at System.Windows.Forms.ToolStripItem.FireEvent(EventArgs e, ToolStripItemEventType met)
+   at System.Windows.Forms.ToolStrip.OnMouseUp(MouseEventArgs mea)
+   at System.Windows.Forms.ToolStripDropDown.OnMouseUp(MouseEventArgs mea)
+   at System.Windows.Forms.Control.WmMouseUp(Message& m, MouseButtons button, Int32 clicks)
+   at System.Windows.Forms.Control.WndProc(Message& m)
+   at System.Windows.Forms.ScrollableControl.WndProc(Message& m)
+   at System.Windows.Forms.ToolStrip.WndProc(Message& m)
+   at System.Windows.Forms.ToolStripDropDown.WndProc(Message& m)
+   at System.Windows.Forms.Control.ControlNativeWindow.OnMessage(Message& m)
+   at System.Windows.Forms.Control.ControlNativeWindow.WndProc(Message& m)
+   at System.Windows.Forms.NativeWindow.Callback(IntPtr hWnd, WM msg, IntPtr wparam, IntPtr lparam)
+
+
+============  日志启动(2023/6/26 9:47:58)  ============
+Exception(2023/6/26 9:48:20):System.NullReferenceException: Object reference not set to an instance of an object.
+   at WeChatAddFriend.WeChatAddFriendForm.<>c__DisplayClass28_0.<转为WIFI连接ToolStripMenuItem_Click>b__0(DeviceData k) in D:\src\WeChatAddFriend\src\WeChatAddFriend\WeChatAddFriendForm.cs:line 1058
+   at System.Linq.Enumerable.TryGetFirst[TSource](IEnumerable`1 source, Func`2 predicate, Boolean& found)
+   at System.Linq.Enumerable.FirstOrDefault[TSource](IEnumerable`1 source, Func`2 predicate)
+   at WeChatAddFriend.WeChatAddFriendForm.转为WIFI连接ToolStripMenuItem_Click(Object sender, EventArgs e) in D:\src\WeChatAddFriend\src\WeChatAddFriend\WeChatAddFriendForm.cs:line 1058
+   at System.Windows.Forms.ToolStripItem.RaiseEvent(Object key, EventArgs e)
+   at System.Windows.Forms.ToolStripMenuItem.OnClick(EventArgs e)
+   at System.Windows.Forms.ToolStripItem.HandleClick(EventArgs e)
+   at System.Windows.Forms.ToolStripItem.HandleMouseUp(MouseEventArgs e)
+   at System.Windows.Forms.ToolStripItem.FireEventInteractive(EventArgs e, ToolStripItemEventType met)
+   at System.Windows.Forms.ToolStripItem.FireEvent(EventArgs e, ToolStripItemEventType met)
+   at System.Windows.Forms.ToolStrip.OnMouseUp(MouseEventArgs mea)
+   at System.Windows.Forms.ToolStripDropDown.OnMouseUp(MouseEventArgs mea)
+   at System.Windows.Forms.Control.WmMouseUp(Message& m, MouseButtons button, Int32 clicks)
+   at System.Windows.Forms.Control.WndProc(Message& m)
+   at System.Windows.Forms.ScrollableControl.WndProc(Message& m)
+   at System.Windows.Forms.ToolStrip.WndProc(Message& m)
+   at System.Windows.Forms.ToolStripDropDown.WndProc(Message& m)
+   at System.Windows.Forms.Control.ControlNativeWindow.OnMessage(Message& m)
+   at System.Windows.Forms.Control.ControlNativeWindow.WndProc(Message& m)
+   at System.Windows.Forms.NativeWindow.Callback(IntPtr hWnd, WM msg, IntPtr wparam, IntPtr lparam)
+
+
+============  日志启动(2023/6/26 9:49:26)  ============
+Exception(2023/6/26 9:49:51):System.ArgumentNullException: Value cannot be null. (Parameter 'host')
+   at AdvancedSharpAdbClient.AdbClientExtensions.Connect(IAdbClient client, String host) in D:\src\WeChatAddFriend\src\WeChatAddFriend\AdbClient\Extensions\AdbClientExtensions.cs:line 118
+   at WeChatAddFriend.WeChatAddFriendForm.转为WIFI连接ToolStripMenuItem_Click(Object sender, EventArgs e) in D:\src\WeChatAddFriend\src\WeChatAddFriend\WeChatAddFriendForm.cs:line 1061
+   at System.Windows.Forms.ToolStripItem.RaiseEvent(Object key, EventArgs e)
+   at System.Windows.Forms.ToolStripMenuItem.OnClick(EventArgs e)
+   at System.Windows.Forms.ToolStripItem.HandleClick(EventArgs e)
+   at System.Windows.Forms.ToolStripItem.HandleMouseUp(MouseEventArgs e)
+   at System.Windows.Forms.ToolStripItem.FireEventInteractive(EventArgs e, ToolStripItemEventType met)
+   at System.Windows.Forms.ToolStripItem.FireEvent(EventArgs e, ToolStripItemEventType met)
+   at System.Windows.Forms.ToolStrip.OnMouseUp(MouseEventArgs mea)
+   at System.Windows.Forms.ToolStripDropDown.OnMouseUp(MouseEventArgs mea)
+   at System.Windows.Forms.Control.WmMouseUp(Message& m, MouseButtons button, Int32 clicks)
+   at System.Windows.Forms.Control.WndProc(Message& m)
+   at System.Windows.Forms.ScrollableControl.WndProc(Message& m)
+   at System.Windows.Forms.ToolStrip.WndProc(Message& m)
+   at System.Windows.Forms.ToolStripDropDown.WndProc(Message& m)
+   at System.Windows.Forms.Control.ControlNativeWindow.OnMessage(Message& m)
+   at System.Windows.Forms.Control.ControlNativeWindow.WndProc(Message& m)
+   at System.Windows.Forms.NativeWindow.Callback(IntPtr hWnd, WM msg, IntPtr wparam, IntPtr lparam)
+
+
+============  日志启动(2023/6/26 9:53:01)  ============
+
+============  日志启动(2023/6/26 9:54:15)  ============
+
+============  日志启动(2023/6/26 9:54:28)  ============
+Info(2023/6/26 9:54:50):微信添加好友开始.......
+
+Info(2023/6/26 10:17:45):微信分身添加好友开始.......
+
+Info(2023/6/26 10:18:03):微信转发朋友圈开始.......
+
+Info(2023/6/26 10:18:03):微信转发朋友圈开始.......
+
+Info(2023/6/26 10:22:02):微信分身转发朋友圈开始.......
+
+Info(2023/6/26 10:22:02):微信分身转发朋友圈开始.......
+
+Exception(2023/6/26 10:46:40):System.ArgumentNullException: Value cannot be null. (Parameter 'host')
+   at AdvancedSharpAdbClient.AdbClientExtensions.Connect(IAdbClient client, String host) in D:\src\WeChatAddFriend\src\WeChatAddFriend\AdbClient\Extensions\AdbClientExtensions.cs:line 118
+   at WeChatAddFriend.WeChatAddFriendForm.转为WIFI连接ToolStripMenuItem_Click(Object sender, EventArgs e) in D:\src\WeChatAddFriend\src\WeChatAddFriend\WeChatAddFriendForm.cs:line 1061
+   at System.Windows.Forms.ToolStripItem.RaiseEvent(Object key, EventArgs e)
+   at System.Windows.Forms.ToolStripMenuItem.OnClick(EventArgs e)
+   at System.Windows.Forms.ToolStripItem.HandleClick(EventArgs e)
+   at System.Windows.Forms.ToolStripItem.HandleMouseUp(MouseEventArgs e)
+   at System.Windows.Forms.ToolStripItem.FireEventInteractive(EventArgs e, ToolStripItemEventType met)
+   at System.Windows.Forms.ToolStripItem.FireEvent(EventArgs e, ToolStripItemEventType met)
+   at System.Windows.Forms.ToolStrip.OnMouseUp(MouseEventArgs mea)
+   at System.Windows.Forms.ToolStripDropDown.OnMouseUp(MouseEventArgs mea)
+   at System.Windows.Forms.Control.WmMouseUp(Message& m, MouseButtons button, Int32 clicks)
+   at System.Windows.Forms.Control.WndProc(Message& m)
+   at System.Windows.Forms.ScrollableControl.WndProc(Message& m)
+   at System.Windows.Forms.ToolStrip.WndProc(Message& m)
+   at System.Windows.Forms.ToolStripDropDown.WndProc(Message& m)
+   at System.Windows.Forms.Control.ControlNativeWindow.OnMessage(Message& m)
+   at System.Windows.Forms.Control.ControlNativeWindow.WndProc(Message& m)
+   at System.Windows.Forms.NativeWindow.Callback(IntPtr hWnd, WM msg, IntPtr wparam, IntPtr lparam)
+
+
+============  日志启动(2023/6/26 10:51:22)  ============
+
+============  日志启动(2023/6/26 10:57:47)  ============
+Info(2023/6/26 11:17:53):微信转发朋友圈开始.......
+
+Info(2023/6/26 11:21:56):微信分身转发朋友圈开始.......
+
+
+============  日志启动(2023/6/26 11:31:48)  ============
+Info(2023/6/26 11:31:52):微信转发朋友圈开始.......
+
+Info(2023/6/26 11:31:52):微信转发朋友圈开始.......
+
+Info(2023/6/26 11:35:52):微信分身转发朋友圈开始.......
+
+Info(2023/6/26 11:35:52):微信分身转发朋友圈开始.......
+
+
+============  日志启动(2023/6/26 13:31:08)  ============
+
+============  日志启动(2023/6/26 13:31:48)  ============
+
+============  日志启动(2023/6/26 13:32:58)  ============
+Info(2023/6/26 13:33:07):微信添加好友开始.......
+
+Info(2023/6/26 13:37:01):微信分身添加好友开始.......
+
+
+============  日志启动(2023/6/26 13:46:43)  ============
