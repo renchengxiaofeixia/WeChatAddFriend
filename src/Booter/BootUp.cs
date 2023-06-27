@@ -35,7 +35,7 @@ namespace Booter
             DateTime now = DateTime.Now;
             while ((DateTime.Now - now).TotalSeconds < (double)waitSec)
             {
-                if (!BootUp.IsProcessRuning("TopSycm"))
+                if (!BootUp.IsProcessRuning("WeChatAddFriend"))
                 {
                     break;
                 }

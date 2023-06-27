@@ -1407,7 +1407,6 @@ namespace WeChatAddFriend
         {
             if (adbClient == null) return;
             dynamic dy = dgPhones.CurrentRow.DataBoundItem;
-
             var d = adbClient.GetDevices().FirstOrDefault(k => k.State == DeviceState.Online && k.Serial == dy.Serial);
             if (d == null) return;
             //去除已经添加过手机号码
@@ -1429,6 +1428,51 @@ namespace WeChatAddFriend
                     if (int.TryParse(txtAddCount.Text.Trim(), out int avgPhoneNoCnt))
                     {
                         await AddFriendTask(d, importPhoneNos.Take(avgPhoneNoCnt).ToList(), dataFrom, addFriendTokenSource);
+                    }
+                }
+                catch { }
+
+            }, addFriendTokenSource.Token);
+        }
+
+
+        private async void 分身转发朋友圈ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+            if (adbClient == null) return;
+            dynamic dy = dgPhones.CurrentRow.DataBoundItem;
+            var d = adbClient.GetDevices().FirstOrDefault(k => k.State == DeviceState.Online && k.Serial == dy.Serial);
+            if (d == null) return;
+            var forwardMomentsTokenSource = new CancellationTokenSource();
+            btnStopForwardMoments.Tag = forwardMomentsTokenSource;
+            await ForwardMoments(d, txtWeChatNo.Text.Trim(), forwardMomentsTokenSource,true);
+        }
+
+        private async void 分身微信加好友ToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            if (adbClient == null) return;
+            dynamic dy = dgPhones.CurrentRow.DataBoundItem;
+            var d = adbClient.GetDevices().FirstOrDefault(k => k.State == DeviceState.Online && k.Serial == dy.Serial);
+            if (d == null) return;
+            //去除已经添加过手机号码
+            importPhoneNos = importPhoneNos.Except(addedPhoneNos).ToList();
+            File.WriteAllLines(importFilePath, importPhoneNos);
+            var dataFrom = string.Empty;
+            var addFriendTokenSource = new CancellationTokenSource();
+            this.InvokeOnUiThreadIfRequired(() =>
+            {
+                btnImportData.Text = $"导入数据({importPhoneNos.Count()}条)";
+                dataFrom = txtDataFrom.Text.Trim();
+                btnStopAddFriend.Tag = addFriendTokenSource;
+            });
+
+            await Task.Run(async () =>
+            {
+                try
+                {
+                    if (int.TryParse(txtAddCount.Text.Trim(), out int avgPhoneNoCnt))
+                    {
+                        await AddFriendTask(d, importPhoneNos.Take(avgPhoneNoCnt).ToList(), dataFrom, addFriendTokenSource,true);
                     }
                 }
                 catch { }
@@ -1497,6 +1541,7 @@ namespace WeChatAddFriend
             }
             return existMultiWechat;
         }
+
     }
 
     public class Params
