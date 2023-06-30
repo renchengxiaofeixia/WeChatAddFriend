@@ -59,4 +59,10 @@ namespace WeChatAddFriend
         [JsonPropertyName("creator")]
         public string? Creator { get; set; }
     }
+
+    public class WeChatPhoneInfo
+    {
+        public string PhoneSerial { get; set; }
+        public string WeChatNo { get; set; }
+    }
 }

@@ -499,3 +499,76 @@ Info(2023/6/26 13:37:01):微信分身添加好友开始.......
 ============  日志启动(2023/6/26 13:54:44)  ============
 
 ============  日志启动(2023/6/27 11:30:31)  ============
+
+============  日志启动(2023/6/29 16:23:32)  ============
+Info(2023/6/29 16:23:45):微信添加好友开始.......
+
+Info(2023/6/29 16:28:25):微信分身添加好友开始.......
+
+
+============  日志启动(2023/6/30 9:40:57)  ============
+
+============  日志启动(2023/6/30 9:42:25)  ============
+Exception(2023/6/30 9:42:48):System.IO.IOException: The requested operation cannot be performed on a file with a user-mapped section open. : 'D:\src\WeChatAddFriend\src\WeChatAddFriend\bin\Debug\net6.0-windows\userPhones'
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.CreateFile(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategyCore(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategy(FileStream fileStream, String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, Int64 preallocationSize)
+   at System.IO.StreamWriter.ValidateArgsAndOpenPath(String path, Boolean append, Encoding encoding, Int32 bufferSize)
+   at System.IO.File.WriteAllText(String path, String contents)
+   at WeChatAddFriend.LoginForm.LoadUserPhones(String userName) in D:\src\WeChatAddFriend\src\WeChatAddFriend\LoginForm.cs:line 79
+   at System.Threading.Tasks.Task.<>c.<ThrowAsync>b__128_0(Object state)
+
+Info(2023/6/30 9:43:03):微信添加好友开始.......
+
+Info(2023/6/30 9:57:24):微信分身添加好友开始.......
+
+
+============  日志启动(2023/6/30 10:37:35)  ============
+Exception(2023/6/30 10:38:57):System.NullReferenceException: Object reference not set to an instance of an object.
+   at WeChatAddFriend.WeChatAddFriendForm.BackWeChatHome(DeviceData d) in D:\src\WeChatAddFriend\src\WeChatAddFriend\WeChatAddFriendForm.cs:line 493
+   at WeChatAddFriend.WeChatAddFriendForm.btnOpenTasks_Click(Object sender, EventArgs e) in D:\src\WeChatAddFriend\src\WeChatAddFriend\WeChatAddFriendForm.cs:line 1389
+   at System.Threading.Tasks.Task.<>c.<ThrowAsync>b__128_0(Object state)
+
+
+============  日志启动(2023/6/30 10:39:58)  ============
+
+============  日志启动(2023/6/30 10:43:30)  ============
+
+============  日志启动(2023/6/30 10:47:42)  ============
+
+============  日志启动(2023/6/30 10:50:28)  ============
+Exception(2023/6/30 10:50:48):System.ArgumentNullException: Value cannot be null. (Parameter 'source')
+   at System.Linq.ThrowHelper.ThrowArgumentNullException(ExceptionArgument argument)
+   at System.Linq.Enumerable.Count[TSource](IEnumerable`1 source)
+   at WeChatAddFriend.WeChatAddFriendForm.BackWeChatHome(DeviceData d) in D:\src\WeChatAddFriend\src\WeChatAddFriend\WeChatAddFriendForm.cs:line 480
+   at WeChatAddFriend.WeChatAddFriendForm.btnOpenTasks_Click(Object sender, EventArgs e) in D:\src\WeChatAddFriend\src\WeChatAddFriend\WeChatAddFriendForm.cs:line 1407
+   at System.Threading.Tasks.Task.<>c.<ThrowAsync>b__128_0(Object state)
+
+
+============  日志启动(2023/6/30 10:51:13)  ============
+
+============  日志启动(2023/6/30 10:58:36)  ============
+
+============  日志启动(2023/6/30 11:23:58)  ============
+
+============  日志启动(2023/6/30 11:28:26)  ============
+
+============  日志启动(2023/6/30 11:52:47)  ============
+Info(2023/6/30 11:52:58):微信添加好友开始.......
+
+
+============  日志启动(2023/6/30 12:01:58)  ============
+
+============  日志启动(2023/6/30 12:03:11)  ============
+
+============  日志启动(2023/6/30 12:06:12)  ============
+Info(2023/6/30 12:06:42):微信添加好友开始.......
+
+
+============  日志启动(2023/6/30 12:08:31)  ============
+
+============  日志启动(2023/6/30 12:29:11)  ============
+
+============  日志启动(2023/6/30 13:04:33)  ============
