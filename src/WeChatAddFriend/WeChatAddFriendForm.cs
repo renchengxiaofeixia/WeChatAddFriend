@@ -197,6 +197,10 @@ namespace WeChatAddFriend
                         }
                         await Task.WhenAll(tasks);
                     }
+
+                    //去除已经添加过手机号码
+                    importPhoneNos = importPhoneNos.Except(addedPhoneNos).ToList();
+                    File.WriteAllLines(importFilePath, importPhoneNos);
                 }
                 catch { }
 
@@ -234,13 +238,31 @@ namespace WeChatAddFriend
             }
         }
 
-        private void StartMultiWeChat(DeviceData d)
+        private async void StartMultiWeChat(DeviceData d)
         {
             //启动分身微信
             var userId = GetMultiAppUserId(d);
             if (string.IsNullOrEmpty(userId)) return;
             var serilogOutputReceiver = new SerilogOutputReceiver();
-            adbClient.ExecuteRemoteCommand($"am start --user {userId} com.tencent.mm/.ui.LauncherUI  ", d, serilogOutputReceiver);
+            adbClient.ExecuteRemoteCommand($"am start --user {userId} com.tencent.mm/.ui.LauncherUI", d, serilogOutputReceiver);
+
+            await Task.Delay(1000);
+
+            var askOpenMultiapp = adbClient.FindElement(d, "//node[@resource-id='oplus:id/button_always_multiapp']", TimeSpan.FromSeconds(2));
+            if (askOpenMultiapp != null)
+            {
+                askOpenMultiapp.Click();
+
+                await Task.Delay(1000);
+
+                var weChatApps = adbClient.FindElements(d, "//node[@resource-id='oplus:id/resolver_item_name']", TimeSpan.FromSeconds(2));
+                if(weChatApps!=null && weChatApps.Count() == 2)
+                {
+                    weChatApps[1].Click();
+                }
+            }
+
+            await Task.Delay(500);
         }
 
 
@@ -254,10 +276,10 @@ namespace WeChatAddFriend
 
                 var currentWeixinNo = string.Empty;
 
-                
+
             TRY_OPEN_SPARE_WeChat:
                 //回到首页
-                await BackWeChatHome(d);
+                await BackWeChatHome(d, useMultiApp);
 
                 var idx = 0;
                 var homeTabBar = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/f2s' and @text='微信']/..", TimeSpan.FromSeconds(2));
@@ -271,7 +293,7 @@ namespace WeChatAddFriend
                 {
                     if (cancellationTokenSource.Token.IsCancellationRequested)
                     {
-                        PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} 加人任务被取消");
+                        PrintLog($"{DateTime.Now.ToString("MMdd HH:mm:ss")}--{d.Serial.Take(5)} 加人任务被取消");
                         cancellationTokenSource.Token.ThrowIfCancellationRequested();
                     }
 
@@ -302,9 +324,9 @@ namespace WeChatAddFriend
                             var weixinNo = weixinNoTextControl.attributes["text"];
                             currentWeixinNo = weixinNo;
 
-                            if(moreTimesAddFriendWeChatNos.Any(no => no == currentWeixinNo))
+                            if (moreTimesAddFriendWeChatNos.Any(no => no == currentWeixinNo))
                             {
-                                PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} 加人频繁取消加人任务");
+                                PrintLog($"{DateTime.Now.ToString("MMdd HH:mm:ss")}--{d.Serial.Take(5)} 加人频繁取消加人任务");
                                 cancellationTokenSource.Token.ThrowIfCancellationRequested();
                             }
 
@@ -363,7 +385,7 @@ namespace WeChatAddFriend
                     var userNotExist = adbClient.FindElement(d, "//node[@text='该用户不存在']", TimeSpan.FromSeconds(2));
                     if (userNotExist != null)
                     {
-                        PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} add phone ---{phoneNos[idx]}--跳过用户不存在");
+                        PrintLog($"{DateTime.Now.ToString("MMdd HH:mm:ss")}--{d.Serial.Take(5)} add phone ---{phoneNos[idx]}--跳过用户不存在");
                         addedPhoneNos.Add(phoneNos[idx]);
                         idx++;
                         goto ADD_NEXT_PHONE;
@@ -375,7 +397,7 @@ namespace WeChatAddFriend
                     {
                         await Task.Delay(2000);
                         adbClient.BackBtn(d);
-                        PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} add phone ---{phoneNos[idx]}--跳过用户已经是好友");
+                        PrintLog($"{DateTime.Now.ToString("MMdd HH:mm:ss")}--{d.Serial.Take(5)} add phone ---{phoneNos[idx]}--跳过用户已经是好友");
 
                         addedPhoneNos.Add(phoneNos[idx]);
                         idx++;
@@ -386,8 +408,8 @@ namespace WeChatAddFriend
                     if (userAddFrequent != null)
                     {
                         moreTimesAddFriendWeChatNos.Add(currentWeixinNo);
-                        PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} add phone ---{phoneNos[idx]}--操作过于频繁，请稍后再试");
-                        PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} 加人频繁取消加人任务");
+                        PrintLog($"{DateTime.Now.ToString("MMdd HH:mm:ss")}--{d.Serial.Take(5)} add phone ---{phoneNos[idx]}--操作过于频繁，请稍后再试");
+                        PrintLog($"{DateTime.Now.ToString("MMdd HH:mm:ss")}--{d.Serial.Take(5)} 加人频繁取消加人任务");
                         //搜索好友频繁，停止添加好友
                         break;
                     }
@@ -395,7 +417,7 @@ namespace WeChatAddFriend
                     var userAddError = adbClient.FindElement(d, "//node[@text='对方帐号因涉及违规暂不能被加好友']", TimeSpan.FromSeconds(2));
                     if (userAddError != null)
                     {
-                        PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} add phone ---{phoneNos[idx]}--对方帐号因涉及违规暂不能被加好友");
+                        PrintLog($"{DateTime.Now.ToString("MMdd HH:mm:ss")}--{d.Serial.Take(5)} add phone ---{phoneNos[idx]}--对方帐号因涉及违规暂不能被加好友");
                         addedPhoneNos.Add(phoneNos[idx]);
                         idx++;
                         goto ADD_NEXT_PHONE;
@@ -442,7 +464,7 @@ namespace WeChatAddFriend
 
                     if (cancellationTokenSource.Token.IsCancellationRequested)
                     {
-                        PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} 加人任务被取消");
+                        PrintLog($"{DateTime.Now.ToString("MMdd HH:mm:ss")}--{d.Serial.Take(5)} 加人任务被取消");
                         cancellationTokenSource.Token.ThrowIfCancellationRequested();
                     }
 
@@ -459,14 +481,14 @@ namespace WeChatAddFriend
                     if (add != null)
                     {
                         moreTimesAddFriendWeChatNos.Add(currentWeixinNo);
-                        PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} 加人频繁取消加人任务");
+                        PrintLog($"{DateTime.Now.ToString("MMdd HH:mm:ss")}--{d.Serial.Take(5)} 加人频繁取消加人任务");
                         cancellationTokenSource.Token.ThrowIfCancellationRequested();
                         //adbClient.Click(d, add.cords);
                         //await Task.Delay(1000);
                     }
 
                     addedPhoneNos.Add(phoneNos[idx]);
-                    PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} 添加手机号:-{phoneNos[idx]}");
+                    PrintLog($"{DateTime.Now.ToString("MMdd HH:mm:ss")}--{d.Serial.Take(5)} 添加手机号:-{phoneNos[idx]}");
 
                     if (addedPhoneNos.Count >= importPhoneNos.Count)
                     {
@@ -481,7 +503,7 @@ namespace WeChatAddFriend
 
                     if (cancellationTokenSource.Token.IsCancellationRequested)
                     {
-                        PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} 加人任务被取消");
+                        PrintLog($"{DateTime.Now.ToString("MMdd HH:mm:ss")}--{d.Serial.Take(5)} 加人任务被取消");
                         cancellationTokenSource.Token.ThrowIfCancellationRequested();
                     }
 
@@ -524,7 +546,8 @@ namespace WeChatAddFriend
 
         private Task BackWeChatHome(DeviceData d, bool useMultiApp = false)
         {
-            return Task.Run(async () => {             
+            return Task.Run(async () =>
+            {
                 while (true)
                 {
                     var weixinControls = adbClient.FindElements(d, "//node[@package='com.tencent.mm']", TimeSpan.FromSeconds(2));
@@ -535,7 +558,7 @@ namespace WeChatAddFriend
                     }
 
                     var barBtns = adbClient.FindElements(d, "//node[@resource-id='com.tencent.mm:id/f2s']", TimeSpan.FromSeconds(2));
-                    if(barBtns!=null 
+                    if (barBtns != null
                        && barBtns.Count() == 4
                        && barBtns[0].attributes["text"] == "微信"
                        && barBtns[1].attributes["text"] == "通讯录"
@@ -550,16 +573,16 @@ namespace WeChatAddFriend
                             PrintLog($"点击底部微信barbutton");
                             await Task.Delay(1000);
                         }
-                    } 
+                    }
 
 
                     //搜索按钮
-                    var title = adbClient.FindElement(d, "//node[@resource-id='android:id/text1']", TimeSpan.FromSeconds(2));
+                    var titles = adbClient.FindElements(d, "//node[@resource-id='android:id/text1']", TimeSpan.FromSeconds(2));
                     var searchBtn = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/gsl']", TimeSpan.FromSeconds(2));
                     var searchMoreBtn = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/grs']", TimeSpan.FromSeconds(2));
 
 
-                    if (title?.attributes["text"].StartsWith("微信") == true
+                    if (titles != null && titles.All(t => t.attributes["text"].StartsWith("微信") == true)
                         && searchBtn?.attributes["content-desc"].StartsWith("搜索") == true
                         && searchMoreBtn?.attributes["content-desc"].StartsWith("更多功能按钮") == true)
                     {
@@ -618,6 +641,7 @@ namespace WeChatAddFriend
                     }
                     await Task.WhenAll(tasks);
 
+                    idx = 0;
                     SleepWithDoEvent(hour * 60 * 60 * 1000);
                 }
             }, forwardMomentsTokenSource.Token);
@@ -636,7 +660,7 @@ namespace WeChatAddFriend
                 if (forwardMomentsTokenSource.Token.IsCancellationRequested)
                 {
                     forwardMomentsTokenSource.Token.ThrowIfCancellationRequested();
-                    PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} 发圈任务被取消");
+                    PrintLog($"{DateTime.Now.ToString("MMdd HH:mm:ss")}--{d.Serial.Take(5)} 发圈任务被取消");
                 }
                 StartWeChat(d, useMultiApp);
 
@@ -671,7 +695,7 @@ namespace WeChatAddFriend
                 if (forwardMomentsTokenSource.Token.IsCancellationRequested)
                 {
                     forwardMomentsTokenSource.Token.ThrowIfCancellationRequested();
-                    PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} 发圈任务被取消");
+                    PrintLog($"{DateTime.Now.ToString("MMdd HH:mm:ss")}--{d.Serial.Take(5)} 发圈任务被取消");
                 }
                 //wangyaqing1991    
 
@@ -720,7 +744,7 @@ namespace WeChatAddFriend
                 if (forwardMomentsTokenSource.Token.IsCancellationRequested)
                 {
                     forwardMomentsTokenSource.Token.ThrowIfCancellationRequested();
-                    PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} 发圈任务被取消");
+                    PrintLog($"{DateTime.Now.ToString("MMdd HH:mm:ss")}--{d.Serial.Take(5)} 发圈任务被取消");
                 }
                 //长按朋友圈文字，准备复制
                 add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/c2h']", TimeSpan.FromSeconds(2));
@@ -740,7 +764,7 @@ namespace WeChatAddFriend
                 if (forwardMomentsTokenSource.Token.IsCancellationRequested)
                 {
                     forwardMomentsTokenSource.Token.ThrowIfCancellationRequested();
-                    PrintLog($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}--{d.Name} 发圈任务被取消");
+                    PrintLog($"{DateTime.Now.ToString("MMdd HH:mm:ss")}--{d.Serial.Take(5)} 发圈任务被取消");
                 }
                 //保存朋友圈图片
                 var pics = adbClient.FindElements(d, "//node[@content-desc='图片']", TimeSpan.FromSeconds(2));
@@ -892,7 +916,15 @@ namespace WeChatAddFriend
                     adbClient.Click(d, chk.startCords);
                     await Task.Delay(300);
 
+                    //视频第一次点完成
                     add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/en' and @text='完成']", TimeSpan.FromSeconds(2));
+                    if (add != null)
+                    {
+                        adbClient.Click(d, add.cords);
+                        await Task.Delay(1000);
+                    }
+
+                    add = adbClient.FindElement(d, "//node[@resource-id='com.tencent.mm:id/ox9' and @text='完成']", TimeSpan.FromSeconds(2));
                     if (add != null)
                     {
                         adbClient.Click(d, add.cords);
@@ -1542,12 +1574,12 @@ namespace WeChatAddFriend
             if (d == null) return;
             var forwardMomentsTokenSource = new CancellationTokenSource();
             btnStopForwardMoments.Tag = forwardMomentsTokenSource;
-            await ForwardMoments(d, txtWeChatNo.Text.Trim(), forwardMomentsTokenSource,true);
+            await ForwardMoments(d, txtWeChatNo.Text.Trim(), forwardMomentsTokenSource, true);
         }
 
         private async void 分身微信加好友ToolStripMenuItem2_Click(object sender, EventArgs e)
         {
-            if(importPhoneNos==null) return;
+            if (importPhoneNos == null) return;
             if (adbClient == null) return;
             dynamic dy = dgPhones.CurrentRow.DataBoundItem;
             var d = adbClient.GetDevices().FirstOrDefault(k => k.State == DeviceState.Online && k.Serial == dy.Serial);
@@ -1570,7 +1602,7 @@ namespace WeChatAddFriend
                 {
                     if (int.TryParse(txtAddCount.Text.Trim(), out int avgPhoneNoCnt))
                     {
-                        await AddFriendTask(d, importPhoneNos.Take(avgPhoneNoCnt).ToList(), dataFrom, addFriendTokenSource,true);
+                        await AddFriendTask(d, importPhoneNos.Take(avgPhoneNoCnt).ToList(), dataFrom, addFriendTokenSource, true);
                     }
                 }
                 catch { }
@@ -1640,6 +1672,10 @@ namespace WeChatAddFriend
             return existMultiWechat;
         }
 
+        private void WeChatAddFriendForm_Load_1(object sender, EventArgs e)
+        {
+
+        }
     }
 
     public class Params

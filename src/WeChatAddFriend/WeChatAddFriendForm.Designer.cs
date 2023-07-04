@@ -49,6 +49,8 @@
             断开连接ToolStripMenuItem = new ToolStripMenuItem();
             主号转发朋友圈ToolStripMenuItem1 = new ToolStripMenuItem();
             主号微信加好友ToolStripMenuItem1 = new ToolStripMenuItem();
+            分身转发朋友圈ToolStripMenuItem1 = new ToolStripMenuItem();
+            分身微信加好友ToolStripMenuItem2 = new ToolStripMenuItem();
             txtHour = new TextBox();
             label5 = new Label();
             label6 = new Label();
@@ -66,8 +68,7 @@
             label11 = new Label();
             txtDataFrom = new TextBox();
             label12 = new Label();
-            分身转发朋友圈ToolStripMenuItem1 = new ToolStripMenuItem();
-            分身微信加好友ToolStripMenuItem2 = new ToolStripMenuItem();
+            notifyIcon1 = new NotifyIcon(components);
             ((System.ComponentModel.ISupportInitialize)dgPhones).BeginInit();
             ctxMenu.SuspendLayout();
             SuspendLayout();
@@ -208,35 +209,49 @@
             // 
             ctxMenu.Items.AddRange(new ToolStripItem[] { 转为WIFI连接ToolStripMenuItem, 断开连接ToolStripMenuItem, 主号转发朋友圈ToolStripMenuItem1, 主号微信加好友ToolStripMenuItem1, 分身转发朋友圈ToolStripMenuItem1, 分身微信加好友ToolStripMenuItem2 });
             ctxMenu.Name = "ctxMenu";
-            ctxMenu.Size = new Size(181, 158);
+            ctxMenu.Size = new Size(161, 136);
             // 
             // 转为WIFI连接ToolStripMenuItem
             // 
             转为WIFI连接ToolStripMenuItem.Name = "转为WIFI连接ToolStripMenuItem";
-            转为WIFI连接ToolStripMenuItem.Size = new Size(180, 22);
+            转为WIFI连接ToolStripMenuItem.Size = new Size(160, 22);
             转为WIFI连接ToolStripMenuItem.Text = "转为WIFI连接";
             转为WIFI连接ToolStripMenuItem.Click += 转为WIFI连接ToolStripMenuItem_Click;
             // 
             // 断开连接ToolStripMenuItem
             // 
             断开连接ToolStripMenuItem.Name = "断开连接ToolStripMenuItem";
-            断开连接ToolStripMenuItem.Size = new Size(180, 22);
+            断开连接ToolStripMenuItem.Size = new Size(160, 22);
             断开连接ToolStripMenuItem.Text = "断开WIFI连接";
             断开连接ToolStripMenuItem.Click += 断开连接ToolStripMenuItem_Click;
             // 
             // 主号转发朋友圈ToolStripMenuItem1
             // 
             主号转发朋友圈ToolStripMenuItem1.Name = "主号转发朋友圈ToolStripMenuItem1";
-            主号转发朋友圈ToolStripMenuItem1.Size = new Size(180, 22);
+            主号转发朋友圈ToolStripMenuItem1.Size = new Size(160, 22);
             主号转发朋友圈ToolStripMenuItem1.Text = "转发朋友圈";
             主号转发朋友圈ToolStripMenuItem1.Click += 转发朋友圈ToolStripMenuItem1_Click;
             // 
             // 主号微信加好友ToolStripMenuItem1
             // 
             主号微信加好友ToolStripMenuItem1.Name = "主号微信加好友ToolStripMenuItem1";
-            主号微信加好友ToolStripMenuItem1.Size = new Size(180, 22);
+            主号微信加好友ToolStripMenuItem1.Size = new Size(160, 22);
             主号微信加好友ToolStripMenuItem1.Text = "微信加好友";
             主号微信加好友ToolStripMenuItem1.Click += 微信加好友ToolStripMenuItem1_Click;
+            // 
+            // 分身转发朋友圈ToolStripMenuItem1
+            // 
+            分身转发朋友圈ToolStripMenuItem1.Name = "分身转发朋友圈ToolStripMenuItem1";
+            分身转发朋友圈ToolStripMenuItem1.Size = new Size(160, 22);
+            分身转发朋友圈ToolStripMenuItem1.Text = "分身转发朋友圈";
+            分身转发朋友圈ToolStripMenuItem1.Click += 分身转发朋友圈ToolStripMenuItem1_Click;
+            // 
+            // 分身微信加好友ToolStripMenuItem2
+            // 
+            分身微信加好友ToolStripMenuItem2.Name = "分身微信加好友ToolStripMenuItem2";
+            分身微信加好友ToolStripMenuItem2.Size = new Size(160, 22);
+            分身微信加好友ToolStripMenuItem2.Text = "分身微信加好友";
+            分身微信加好友ToolStripMenuItem2.Click += 分身微信加好友ToolStripMenuItem2_Click;
             // 
             // txtHour
             // 
@@ -406,19 +421,10 @@
             label12.Text = "分类";
             label12.Visible = false;
             // 
-            // 分身转发朋友圈ToolStripMenuItem1
+            // notifyIcon1
             // 
-            分身转发朋友圈ToolStripMenuItem1.Name = "分身转发朋友圈ToolStripMenuItem1";
-            分身转发朋友圈ToolStripMenuItem1.Size = new Size(180, 22);
-            分身转发朋友圈ToolStripMenuItem1.Text = "分身转发朋友圈";
-            分身转发朋友圈ToolStripMenuItem1.Click += 分身转发朋友圈ToolStripMenuItem1_Click;
-            // 
-            // 分身微信加好友ToolStripMenuItem2
-            // 
-            分身微信加好友ToolStripMenuItem2.Name = "分身微信加好友ToolStripMenuItem2";
-            分身微信加好友ToolStripMenuItem2.Size = new Size(180, 22);
-            分身微信加好友ToolStripMenuItem2.Text = "分身微信加好友";
-            分身微信加好友ToolStripMenuItem2.Click += 分身微信加好友ToolStripMenuItem2_Click;
+            notifyIcon1.Text = "notifyIcon1";
+            notifyIcon1.Visible = true;
             // 
             // WeChatAddFriendForm
             // 
@@ -461,6 +467,7 @@
             Text = "微信加好友";
             FormClosing += WeChatAddFriendForm_FormClosing;
             FormClosed += WeChatAddFriendForm_FormClosed;
+            Load += WeChatAddFriendForm_Load_1;
             ((System.ComponentModel.ISupportInitialize)dgPhones).EndInit();
             ctxMenu.ResumeLayout(false);
             ResumeLayout(false);
@@ -508,5 +515,6 @@
         private Label label12;
         private ToolStripMenuItem 分身转发朋友圈ToolStripMenuItem1;
         private ToolStripMenuItem 分身微信加好友ToolStripMenuItem2;
+        private NotifyIcon notifyIcon1;
     }
 }
